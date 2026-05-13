@@ -1,51 +1,75 @@
 package com.projetocorridas.projetocorridas.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.projetocorridas.projetocorridas.dto.ParticipanteDto;
+import com.projetocorridas.projetocorridas.model.Participante;
+import com.projetocorridas.projetocorridas.repository.ParticipanteRepository;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ParticipanteService {
-    private final Map<UUID, ParticipanteDto> participantesMap = new HashMap<>();
+
+    @Autowired
+    private ParticipanteRepository participanteRepository;
 
     // Criar novo participante
     public ParticipanteDto criar(ParticipanteDto participanteDto) {
         validarParticipanteDto(participanteDto);
-        participanteDto.setId(UUID.randomUUID());
-        participantesMap.put(participanteDto.getId(), participanteDto);
-        return participanteDto;
+        Participante participante = new Participante();
+        participante.setNome(participanteDto.getNome());
+        participante.setSenha(participanteDto.getSenha());
+
+        Participante salvo = participanteRepository.save(participante);
+        return mapToDto(salvo);
     }
 
     // Obter participante por ID
     public ParticipanteDto obter(UUID id) {
-        return Optional.ofNullable(participantesMap.get(id))
+        Participante participante = participanteRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Participante com ID " + id + " não encontrado"));
+        return mapToDto(participante);
     }
 
     // Listar todos os participantes
     public List<ParticipanteDto> listarTodos() {
-        return List.copyOf(participantesMap.values());
+        return participanteRepository.findAll().stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
     }
 
     // Alterar participante
     public ParticipanteDto alterar(ParticipanteDto participanteDto) {
         UUID id = participanteDto.getId();
-        validarParticipanteExiste(id);
+        Participante existente = participanteRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Participante com ID " + id + " não encontrado"));
 
-        participantesMap.put(id, participanteDto);
-        return participanteDto;
+        existente.setNome(participanteDto.getNome());
+        existente.setSenha(participanteDto.getSenha());
+
+        Participante salvo = participanteRepository.save(existente);
+        return mapToDto(salvo);
     }
 
     // Apagar participante
     public void apagar(UUID id) {
-        validarParticipanteExiste(id);
-        participantesMap.remove(id);
+        if (!participanteRepository.existsById(id)) {
+            throw new IllegalArgumentException("Participante com ID " + id + " não encontrado");
+        }
+        participanteRepository.deleteById(id);
+    }
+
+    private ParticipanteDto mapToDto(Participante participante) {
+        return ParticipanteDto.builder()
+                .id(participante.getId())
+                .nome(participante.getNome())
+                .senha(participante.getSenha())
+                .build();
     }
 
     // Validar participante DTO
@@ -55,13 +79,6 @@ public class ParticipanteService {
         }
         if (participanteDto.getSenha() == null || participanteDto.getSenha().isBlank()) {
             throw new IllegalArgumentException("Senha é obrigatória");
-        }
-    }
-
-    // Validar se participante existe
-    private void validarParticipanteExiste(UUID id) {
-        if (!participantesMap.containsKey(id)) {
-            throw new IllegalArgumentException("Participante com ID " + id + " não encontrado");
         }
     }
 }
