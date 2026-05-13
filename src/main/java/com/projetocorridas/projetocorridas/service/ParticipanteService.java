@@ -1,5 +1,5 @@
 package com.projetocorridas.projetocorridas.service;
 
-public class AlternativaService {
+public class ParticipanteService {
 
 }
