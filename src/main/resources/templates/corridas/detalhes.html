@@ -60,15 +60,26 @@
                         <div class="mb-3" th:if="${corrida.perguntas != null and corrida.perguntas.size() > 0}">
                             <label class="form-label"><strong>Perguntas:</strong></label>
                             <div class="list-group">
-                                <div class="list-group-item" th:each="pergunta : ${corrida.perguntas}">
-                                    <h6 class="mb-2" th:text="${pergunta.titulo}"></h6>
-                                    <p class="mb-2" th:text="${pergunta.descricao}"></p>
-                                </div>
+                                <a class="list-group-item list-group-item-action"
+                                   th:each="pergunta : ${corrida.perguntas}"
+                                   th:href="@{/corridas/{corridaId}/perguntas/{perguntaId}(corridaId=${corrida.id}, perguntaId=${pergunta.id})}">
+                                    <h6 class="mb-2" th:text="${pergunta.enunciado}"></h6>
+                                    <p class="mb-0">
+                                        Respostas corretas:
+                                        <span th:text="${pergunta.respostaCorreta}"></span>
+                                    </p>
+                                </a>
                             </div>
                         </div>
 
                         <div th:if="${corrida.perguntas == null or corrida.perguntas.size() == 0}" class="alert alert-info">
                             Nenhuma pergunta cadastrada para esta corrida.
+                            <div class="mt-3">
+                                <a th:href="@{/corridas/{corridaId}/perguntas/novo(corridaId=${corrida.id})}"
+                                   class="btn btn-primary btn-sm">Criar Pergunta</a>
+                                <a th:href="@{/corridas/{corridaId}/perguntas(corridaId=${corrida.id})}"
+                                   class="btn btn-outline-secondary btn-sm">Gerenciar Perguntas</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -83,6 +94,7 @@
                     <div class="card-body">
                         <div class="d-grid gap-2">
                             <a th:href="@{/corridas/{corridaId}/perguntas(corridaId=${corrida.id})}" class="btn btn-info text-white">Gerenciar Perguntas</a>
+                            <a th:href="@{/corridas/{corridaId}/perguntas/novo(corridaId=${corrida.id})}" class="btn btn-outline-primary">Nova Pergunta</a>
                             <a th:href="@{/corridas/{id}/editar(id=${corrida.id})}" class="btn btn-warning">Editar</a>
                             <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmarDelecao">
                                 Deletar

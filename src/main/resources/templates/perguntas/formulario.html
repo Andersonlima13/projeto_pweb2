@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${acao} + ' Pergunta - Projeto Corridas'"></title>
+    <title th:text="${acao} + ' Pergunta - Projeto Corridas'">Pergunta</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body>
@@ -18,84 +18,155 @@
         </div>
     </nav>
 
-    <div class="container mt-5">
-        <!-- Breadcrumb -->
+    <main class="container mt-5">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a th:href="@{/corridas}">Corridas</a></li>
-                <li class="breadcrumb-item"><a th:href="@{/corridas/{id}(id=${corrida.id})}" th:text="${corrida.titulo}"></a></li>
-                <li class="breadcrumb-item"><a th:href="@{/corridas/{corridaId}/perguntas(corridaId=${corrida.id})}">Perguntas</a></li>
-                <li class="breadcrumb-item active" th:text="${acao} + ' Pergunta'"></li>
+                <li class="breadcrumb-item">
+                    <a th:href="@{/corridas/{id}(id=${corrida.id})}" th:text="${corrida.titulo}">Corrida</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a th:href="@{/corridas/{corridaId}/perguntas(corridaId=${corrida.id})}">Perguntas</a>
+                </li>
+                <li class="breadcrumb-item active" th:text="${acao}">Ação</li>
             </ol>
         </nav>
 
         <div class="row justify-content-center">
-            <div class="col-md-8">
+            <div class="col-lg-8">
                 <div class="card">
                     <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0" th:text="${acao} + ' Pergunta - ' + ${corrida.titulo}"></h5>
+                        <h5 class="mb-0" th:text="${acao} + ' Pergunta'">Pergunta</h5>
                     </div>
                     <div class="card-body">
-                        <form th:object="${perguntaDto}">
-                            <!-- id (oculto para edição) -->
-                            <input type="hidden" th:if="${perguntaDto.id != null}" 
-                                   th:field="*{id}" />
-                            <!-- corridaId (oculto) -->
-                            <input type="hidden" th:field="*{corridaId}" />
+                        <form th:action="@{/corridas/{corridaId}/perguntas/salvar(corridaId=${corrida.id})}"
+                              th:object="${perguntaDto}" method="POST">
+                            <input type="hidden" th:field="*{id}">
+                            <input type="hidden" th:field="*{corridaId}">
+                            <input type="hidden" th:field="*{respostaCorreta}" id="respostaCorreta">
 
-                            <!-- Enunciado -->
-                            <div class="mb-3">
+                            <div class="mb-4">
                                 <label for="enunciado" class="form-label">Enunciado</label>
                                 <textarea class="form-control" id="enunciado" rows="4"
-                                          th:field="*{enunciado}" placeholder="Digite o enunciado da pergunta" required></textarea>
-                                <small class="form-text text-muted">O texto da pergunta</small>
+                                          th:field="*{enunciado}" required></textarea>
                             </div>
 
-                            <!-- Resposta Correta -->
-                            <div class="mb-3">
-                                <label for="respostaCorreta" class="form-label">Resposta Correta (número da alternativa)</label>
-                                <input type="number" class="form-control" id="respostaCorreta" 
-                                       th:field="*{respostaCorreta}" placeholder="Ex: 1, 2, 3, etc" required min="1">
-                                <small class="form-text text-muted">Número da alternativa correta</small>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h6 class="mb-0">Alternativas</h6>
+                                    <span class="text-muted small">Respostas corretas: <span id="contadorCorretas">0</span></span>
+                                </div>
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="adicionarAlternativa">
+                                    Adicionar Alternativa
+                                </button>
                             </div>
 
-                            <!-- Botões -->
-                            <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary" th:text="${acao}"></button>
-                                <a th:href="@{/corridas/{corridaId}/perguntas(corridaId=${corrida.id})}" class="btn btn-secondary">Cancelar</a>
+                            <div id="alternativas">
+                                <div class="border rounded p-3 mb-3 alternativa-item"
+                                     th:each="alternativa, stat : *{alternativas}">
+                                    <input type="hidden" th:field="*{alternativas[__${stat.index}__].id}">
+                                    <input type="hidden" th:field="*{alternativas[__${stat.index}__].perguntaId}">
+
+                                    <div class="mb-3">
+                                        <label class="form-label"
+                                               th:for="${'alternativaDescricao' + stat.index}">Descrição</label>
+                                        <input type="text" class="form-control descricao-alternativa"
+                                               th:id="${'alternativaDescricao' + stat.index}"
+                                               th:field="*{alternativas[__${stat.index}__].descricao}">
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="form-check mb-0">
+                                            <input type="checkbox" class="form-check-input correta-alternativa"
+                                                   th:id="${'alternativaCorreta' + stat.index}"
+                                                   th:field="*{alternativas[__${stat.index}__].isCorreta}">
+                                            <label class="form-check-label"
+                                                   th:for="${'alternativaCorreta' + stat.index}">Correta</label>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-danger btn-sm remover-alternativa">
+                                            Remover
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary">Salvar</button>
+                                <a th:href="@{/corridas/{corridaId}/perguntas(corridaId=${corrida.id})}"
+                                   class="btn btn-secondary">Cancelar</a>
                             </div>
                         </form>
                     </div>
                 </div>
-
-                <!-- Instruções -->
-                <div class="alert alert-info mt-4">
-                    <h6>Informações:</h6>
-                    <ul class="mb-0">
-                        <li>O enunciado é obrigatório</li>
-                        <li>A resposta correta deve ser um número</li>
-                        <li>As alternativas serão adicionadas após criar a pergunta</li>
-                    </ul>
-                </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script th:inline="javascript">
-        // Se for edição, ajustar a action do formulário
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('form');
-            const perguntaId = document.querySelector('input[name="id"]');
-            const corridaId = document.querySelector('input[name="corridaId"]').value;
-            
-            if (perguntaId && perguntaId.value) {
-                form.method = 'POST';
-                form.action = '[[@{/corridas/}]]' + corridaId + '/perguntas/' + perguntaId.value;
-            } else {
-                form.method = 'POST';
-                form.action = '[[@{/corridas/}]]' + corridaId + '/perguntas';
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const container = document.getElementById('alternativas');
+            const adicionar = document.getElementById('adicionarAlternativa');
+            const respostaCorreta = document.getElementById('respostaCorreta');
+            const contadorCorretas = document.getElementById('contadorCorretas');
+            let indice = container.querySelectorAll('.alternativa-item').length;
+
+            function atualizarContagem() {
+                const corretas = Array.from(container.querySelectorAll('.alternativa-item'))
+                    .filter(function (item) {
+                        const descricao = item.querySelector('.descricao-alternativa');
+                        const correta = item.querySelector('.correta-alternativa');
+                        return descricao && descricao.value.trim() !== '' && correta && correta.checked;
+                    }).length;
+
+                respostaCorreta.value = corretas;
+                contadorCorretas.textContent = corretas;
             }
+
+            function criarAlternativa() {
+                const item = document.createElement('div');
+                item.className = 'border rounded p-3 mb-3 alternativa-item';
+                item.innerHTML = `
+                    <input type="hidden" name="alternativas[${indice}].id">
+                    <input type="hidden" name="alternativas[${indice}].perguntaId">
+                    <div class="mb-3">
+                        <label class="form-label" for="alternativaDescricao${indice}">Descrição</label>
+                        <input type="text" class="form-control descricao-alternativa"
+                               id="alternativaDescricao${indice}" name="alternativas[${indice}].descricao">
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="form-check mb-0">
+                            <input type="checkbox" class="form-check-input correta-alternativa"
+                                   id="alternativaCorreta${indice}" name="alternativas[${indice}].isCorreta" value="true">
+                            <label class="form-check-label" for="alternativaCorreta${indice}">Correta</label>
+                        </div>
+                        <button type="button" class="btn btn-outline-danger btn-sm remover-alternativa">Remover</button>
+                    </div>
+                `;
+                container.appendChild(item);
+                indice++;
+            }
+
+            adicionar.addEventListener('click', function () {
+                criarAlternativa();
+                atualizarContagem();
+            });
+
+            container.addEventListener('click', function (event) {
+                if (!event.target.classList.contains('remover-alternativa')) {
+                    return;
+                }
+
+                const item = event.target.closest('.alternativa-item');
+                if (item) {
+                    item.remove();
+                    atualizarContagem();
+                }
+            });
+
+            container.addEventListener('input', atualizarContagem);
+            container.addEventListener('change', atualizarContagem);
+            atualizarContagem();
         });
     </script>
 </body>

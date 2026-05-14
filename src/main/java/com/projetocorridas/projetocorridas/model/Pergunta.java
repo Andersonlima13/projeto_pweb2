@@ -1,5 +1,6 @@
 package com.projetocorridas.projetocorridas.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,6 +27,6 @@ public class Pergunta {
     private String enunciado;
     private Integer respostaCorreta;
 
-    @OneToMany
+    @OneToMany(mappedBy = "pergunta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Alternativa> alternativas;
 }

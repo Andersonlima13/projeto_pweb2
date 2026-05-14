@@ -7,6 +7,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.projetocorridas.projetocorridas.dto.CorridaDto;
 import com.projetocorridas.projetocorridas.service.CorridaService;
+import com.projetocorridas.projetocorridas.service.PerguntaService;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,6 +18,9 @@ public class CorridaController {
 
     @Autowired
     private CorridaService corridaService;
+
+    @Autowired
+    private PerguntaService perguntaService;
 
     @GetMapping
     public ModelAndView listar() {
@@ -49,6 +53,7 @@ public class CorridaController {
         ModelAndView mv = new ModelAndView("corridas/detalhes");
         try {
             CorridaDto corrida = corridaService.obter(id);
+            corrida.setPerguntas(perguntaService.listarPorCorrida(id));
             mv.addObject("corrida", corrida);
         } catch (IllegalArgumentException e) {
             mv.setViewName("redirect:/corridas");

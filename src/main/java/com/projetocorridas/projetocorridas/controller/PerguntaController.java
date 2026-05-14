@@ -5,11 +5,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.projetocorridas.projetocorridas.dto.CorridaDto;
+import com.projetocorridas.projetocorridas.dto.AlternativaDto;
 import com.projetocorridas.projetocorridas.dto.PerguntaDto;
+import com.projetocorridas.projetocorridas.dto.CorridaDto;
+import com.projetocorridas.projetocorridas.service.AlternativaService;
 import com.projetocorridas.projetocorridas.service.CorridaService;
 import com.projetocorridas.projetocorridas.service.PerguntaService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,12 +26,16 @@ public class PerguntaController {
     @Autowired
     private CorridaService corridaService;
 
+    @Autowired
+    private AlternativaService alternativaService;
+
     @GetMapping
     public ModelAndView listar(@PathVariable UUID corridaId) {
         ModelAndView mv = new ModelAndView("perguntas/listar");
         try {
             CorridaDto corrida = corridaService.obter(corridaId);
             List<PerguntaDto> perguntas = perguntaService.listarPorCorrida(corridaId);
+            perguntas.forEach(this::carregarAlternativas);
             mv.addObject("corrida", corrida);
             mv.addObject("perguntas", perguntas);
         } catch (IllegalArgumentException e) {
@@ -37,7 +44,6 @@ public class PerguntaController {
         return mv;
     }
 
-    // Exibir formulário para criar nova pergunta
     @GetMapping("/novo")
     public ModelAndView formularioCriar(@PathVariable UUID corridaId) {
         ModelAndView mv = new ModelAndView("perguntas/formulario");
@@ -45,6 +51,8 @@ public class PerguntaController {
             CorridaDto corrida = corridaService.obter(corridaId);
             PerguntaDto perguntaDto = new PerguntaDto();
             perguntaDto.setCorridaId(corridaId);
+            perguntaDto.setRespostaCorreta(0);
+            prepararAlternativasFormulario(perguntaDto);
             mv.addObject("corrida", corrida);
             mv.addObject("perguntaDto", perguntaDto);
             mv.addObject("acao", "Criar");
@@ -54,15 +62,33 @@ public class PerguntaController {
         return mv;
     }
 
-    @PostMapping
-    public String criar(@PathVariable UUID corridaId, @ModelAttribute PerguntaDto perguntaDto) {
+    @PostMapping("/salvar")
+    public String salvar(@PathVariable UUID corridaId, @ModelAttribute PerguntaDto perguntaDto) {
         try {
             perguntaDto.setCorridaId(corridaId);
-            perguntaService.criar(perguntaDto);
+            List<AlternativaDto> alternativas = alternativasValidas(perguntaDto.getAlternativas());
+            perguntaDto.setRespostaCorreta(contarAlternativasCorretas(alternativas));
+
+            if (perguntaDto.getId() != null) {
+                perguntaService.alterar(perguntaDto);
+                alternativaService.substituirPorPergunta(perguntaDto.getId(), alternativas);
+            } else {
+                PerguntaDto perguntaCriada = perguntaService.criar(perguntaDto);
+                alternativaService.substituirPorPergunta(perguntaCriada.getId(), alternativas);
+            }
+
             return "redirect:/corridas/" + corridaId + "/perguntas";
         } catch (IllegalArgumentException e) {
+            if (perguntaDto.getId() != null) {
+                return "redirect:/corridas/" + corridaId + "/perguntas/editar/" + perguntaDto.getId();
+            }
             return "redirect:/corridas/" + corridaId + "/perguntas/novo";
         }
+    }
+
+    @PostMapping
+    public String criar(@PathVariable UUID corridaId, @ModelAttribute PerguntaDto perguntaDto) {
+        return salvar(corridaId, perguntaDto);
     }
 
     @GetMapping("/{perguntaId}")
@@ -71,6 +97,7 @@ public class PerguntaController {
         try {
             CorridaDto corrida = corridaService.obter(corridaId);
             PerguntaDto pergunta = perguntaService.obter(corridaId, perguntaId);
+            pergunta.setAlternativas(alternativaService.listarPorPergunta(perguntaId));
             mv.addObject("corrida", corrida);
             mv.addObject("pergunta", pergunta);
         } catch (IllegalArgumentException e) {
@@ -79,12 +106,14 @@ public class PerguntaController {
         return mv;
     }
 
-    @GetMapping("/{perguntaId}/editar")
+    @GetMapping({ "/editar/{perguntaId}", "/{perguntaId}/editar" })
     public ModelAndView formularioEditar(@PathVariable UUID corridaId, @PathVariable UUID perguntaId) {
         ModelAndView mv = new ModelAndView("perguntas/formulario");
         try {
             CorridaDto corrida = corridaService.obter(corridaId);
             PerguntaDto pergunta = perguntaService.obter(corridaId, perguntaId);
+            pergunta.setAlternativas(alternativaService.listarPorPergunta(perguntaId));
+            prepararAlternativasFormulario(pergunta);
             mv.addObject("corrida", corrida);
             mv.addObject("perguntaDto", pergunta);
             mv.addObject("acao", "Editar");
@@ -97,14 +126,13 @@ public class PerguntaController {
     @PostMapping("/{perguntaId}")
     public String alterar(@PathVariable UUID corridaId, @PathVariable UUID perguntaId,
             @ModelAttribute PerguntaDto perguntaDto) {
-        try {
-            perguntaDto.setId(perguntaId);
-            perguntaDto.setCorridaId(corridaId);
-            perguntaService.alterar(perguntaDto);
-            return "redirect:/corridas/" + corridaId + "/perguntas/" + perguntaId;
-        } catch (IllegalArgumentException e) {
-            return "redirect:/corridas/" + corridaId + "/perguntas/" + perguntaId + "/editar";
-        }
+        perguntaDto.setId(perguntaId);
+        return salvar(corridaId, perguntaDto);
+    }
+
+    @GetMapping("/apagar/{perguntaId}")
+    public String apagarPorGet(@PathVariable UUID corridaId, @PathVariable UUID perguntaId) {
+        return apagar(corridaId, perguntaId);
     }
 
     @PostMapping("/{perguntaId}/deletar")
@@ -115,5 +143,49 @@ public class PerguntaController {
         } catch (IllegalArgumentException e) {
             return "redirect:/corridas/" + corridaId + "/perguntas/" + perguntaId;
         }
+    }
+
+    private void carregarAlternativas(PerguntaDto pergunta) {
+        pergunta.setAlternativas(alternativaService.listarPorPergunta(pergunta.getId()));
+    }
+
+    private void prepararAlternativasFormulario(PerguntaDto perguntaDto) {
+        if (perguntaDto.getAlternativas() == null) {
+            perguntaDto.setAlternativas(new ArrayList<>());
+        }
+
+        if (perguntaDto.getAlternativas().isEmpty()) {
+            perguntaDto.getAlternativas().add(new AlternativaDto());
+        }
+    }
+
+    private List<AlternativaDto> alternativasValidas(List<AlternativaDto> alternativas) {
+        List<AlternativaDto> alternativasValidas = new ArrayList<>();
+
+        if (alternativas == null) {
+            return alternativasValidas;
+        }
+
+        for (AlternativaDto alternativa : alternativas) {
+            if (alternativa == null || alternativa.getDescricao() == null
+                    || alternativa.getDescricao().trim().isEmpty()) {
+                continue;
+            }
+
+            alternativasValidas.add(AlternativaDto.builder()
+                    .id(alternativa.getId())
+                    .perguntaId(alternativa.getPerguntaId())
+                    .descricao(alternativa.getDescricao().trim())
+                    .isCorreta(Boolean.TRUE.equals(alternativa.getIsCorreta()))
+                    .build());
+        }
+
+        return alternativasValidas;
+    }
+
+    private long contarAlternativasCorretas(List<AlternativaDto> alternativas) {
+        return alternativas.stream()
+                .filter(alternativa -> Boolean.TRUE.equals(alternativa.getIsCorreta()))
+                .count();
     }
 }

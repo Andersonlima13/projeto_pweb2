@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.projetocorridas.projetocorridas.dto.PerguntaDto;
-import com.projetocorridas.projetocorridas.dto.AlternativaDto;
 import com.projetocorridas.projetocorridas.model.Pergunta;
 import com.projetocorridas.projetocorridas.repository.PerguntaRepository;
 import com.projetocorridas.projetocorridas.repository.CorridaRepository;
@@ -24,7 +23,6 @@ public class PerguntaService {
 
     private Pergunta dtoToEntity(PerguntaDto dto) {
         Pergunta pergunta = new Pergunta();
-        pergunta.setId(dto.getId());
         pergunta.setCorridaId(dto.getCorridaId());
         pergunta.setEnunciado(dto.getEnunciado());
         pergunta.setRespostaCorreta(Math.toIntExact(dto.getRespostaCorreta()));
@@ -48,7 +46,6 @@ public class PerguntaService {
 
         validarPerguntaDto(perguntaDto);
 
-        perguntaDto.setId(UUID.randomUUID());
         Pergunta pergunta = dtoToEntity(perguntaDto);
         Pergunta salva = perguntaRepository.save(pergunta);
 
@@ -90,10 +87,8 @@ public class PerguntaService {
         }
 
         validarPerguntaDto(perguntaDto);
-
         perguntaExistente.setEnunciado(perguntaDto.getEnunciado());
         perguntaExistente.setRespostaCorreta(Math.toIntExact(perguntaDto.getRespostaCorreta()));
-
         Pergunta atualizada = perguntaRepository.save(perguntaExistente);
         return entityToDto(atualizada);
     }
@@ -114,25 +109,8 @@ public class PerguntaService {
         if (perguntaDto.getEnunciado() == null || perguntaDto.getEnunciado().trim().isEmpty()) {
             throw new IllegalArgumentException("Enunciado é obrigatório");
         }
-        if (perguntaDto.getRespostaCorreta() <= 0) {
-            throw new IllegalArgumentException("Resposta correta é obrigatória");
-        }
-    }
-
-    public void adicionarAlternativa(UUID corridaId, UUID perguntaId, AlternativaDto alternativaDto) {
-        PerguntaDto pergunta = obter(corridaId, perguntaId);
-        if (pergunta != null) {
-            if (pergunta.getAlternativas() == null) {
-                pergunta.setAlternativas(new java.util.ArrayList<>());
-            }
-            pergunta.getAlternativas().add(alternativaDto);
-        }
-    }
-
-    public void removerAlternativa(UUID corridaId, UUID perguntaId, AlternativaDto alternativaDto) {
-        PerguntaDto pergunta = obter(corridaId, perguntaId);
-        if (pergunta != null && pergunta.getAlternativas() != null) {
-            pergunta.getAlternativas().removeIf(a -> a.getId().equals(alternativaDto.getId()));
+        if (perguntaDto.getRespostaCorreta() < 0) {
+            throw new IllegalArgumentException("Quantidade de respostas corretas não pode ser negativa");
         }
     }
 }

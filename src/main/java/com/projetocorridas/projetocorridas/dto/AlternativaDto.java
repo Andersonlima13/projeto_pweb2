@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AlternativaDto {
     private UUID id;
-    private UUID corridaId;
     private UUID perguntaId;
     private String descricao;
     private Boolean isCorreta;
