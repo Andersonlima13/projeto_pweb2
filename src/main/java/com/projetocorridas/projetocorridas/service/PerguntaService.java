@@ -22,7 +22,6 @@ public class PerguntaService {
     @Autowired
     private CorridaRepository corridaRepository;
 
-    // Converter DTO para Entity
     private Pergunta dtoToEntity(PerguntaDto dto) {
         Pergunta pergunta = new Pergunta();
         pergunta.setId(dto.getId());
@@ -32,7 +31,6 @@ public class PerguntaService {
         return pergunta;
     }
 
-    // Converter Entity para DTO
     private PerguntaDto entityToDto(Pergunta entity) {
         return PerguntaDto.builder()
                 .id(entity.getId())
@@ -42,11 +40,9 @@ public class PerguntaService {
                 .build();
     }
 
-    // Criar nova pergunta
     public PerguntaDto criar(PerguntaDto perguntaDto) {
         UUID corridaId = perguntaDto.getCorridaId();
 
-        // Valida se a corrida existe
         corridaRepository.findById(corridaId)
                 .orElseThrow(() -> new IllegalArgumentException("Corrida com ID " + corridaId + " não encontrada"));
 
@@ -59,7 +55,6 @@ public class PerguntaService {
         return entityToDto(salva);
     }
 
-    // Obter pergunta específica
     public PerguntaDto obter(UUID corridaId, UUID perguntaId) {
         Pergunta pergunta = perguntaRepository.findById(perguntaId)
                 .orElseThrow(() -> new IllegalArgumentException(
@@ -73,9 +68,7 @@ public class PerguntaService {
         return entityToDto(pergunta);
     }
 
-    // Listar todas as perguntas de uma corrida
     public List<PerguntaDto> listarPorCorrida(UUID corridaId) {
-        // Valida se a corrida existe
         corridaRepository.findById(corridaId)
                 .orElseThrow(() -> new IllegalArgumentException("Corrida com ID " + corridaId + " não encontrada"));
 
@@ -84,7 +77,6 @@ public class PerguntaService {
                 .collect(Collectors.toList());
     }
 
-    // Alterar pergunta
     public PerguntaDto alterar(PerguntaDto perguntaDto) {
         UUID perguntaId = perguntaDto.getId();
         UUID corridaId = perguntaDto.getCorridaId();
@@ -106,7 +98,6 @@ public class PerguntaService {
         return entityToDto(atualizada);
     }
 
-    // Apagar pergunta
     public void apagar(UUID corridaId, UUID perguntaId) {
         Pergunta pergunta = perguntaRepository.findById(perguntaId)
                 .orElseThrow(() -> new IllegalArgumentException("Pergunta com ID " + perguntaId + " não encontrada"));
@@ -119,7 +110,6 @@ public class PerguntaService {
         perguntaRepository.deleteById(perguntaId);
     }
 
-    // Validar pergunta DTO
     private void validarPerguntaDto(PerguntaDto perguntaDto) {
         if (perguntaDto.getEnunciado() == null || perguntaDto.getEnunciado().trim().isEmpty()) {
             throw new IllegalArgumentException("Enunciado é obrigatório");
@@ -129,7 +119,6 @@ public class PerguntaService {
         }
     }
 
-    // Adicionar alternativa à pergunta
     public void adicionarAlternativa(UUID corridaId, UUID perguntaId, AlternativaDto alternativaDto) {
         PerguntaDto pergunta = obter(corridaId, perguntaId);
         if (pergunta != null) {
@@ -140,7 +129,6 @@ public class PerguntaService {
         }
     }
 
-    // Remover alternativa da pergunta
     public void removerAlternativa(UUID corridaId, UUID perguntaId, AlternativaDto alternativaDto) {
         PerguntaDto pergunta = obter(corridaId, perguntaId);
         if (pergunta != null && pergunta.getAlternativas() != null) {
