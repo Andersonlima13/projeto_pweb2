@@ -122,7 +122,6 @@ public class AlternativaService {
 
     private Alternativa dtoToEntity(AlternativaDto alternativaDto, Pergunta pergunta) {
         Alternativa alternativa = new Alternativa();
-        alternativa.setId(UUID.randomUUID());
         alternativa.setPergunta(pergunta);
         alternativa.setDescricao(alternativaDto.getDescricao().trim());
         alternativa.setIsCorreta(Boolean.TRUE.equals(alternativaDto.getIsCorreta()));
