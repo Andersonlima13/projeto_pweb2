@@ -40,7 +40,7 @@ public class CorridaService {
 
     public CorridaDto criar(CorridaDto corridaDto) {
         validarCorridaDto(corridaDto);
-        corridaDto.setId(UUID.randomUUID());
+        corridaDto.setId(null);
         if (corridaDto.getPerguntas() == null) {
             corridaDto.setPerguntas(new ArrayList<>());
         }
