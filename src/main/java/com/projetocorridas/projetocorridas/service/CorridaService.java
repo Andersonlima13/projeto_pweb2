@@ -1,19 +1,44 @@
 package com.projetocorridas.projetocorridas.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.projetocorridas.projetocorridas.dto.CorridaDto;
+import com.projetocorridas.projetocorridas.dto.PerguntaDto;
+import com.projetocorridas.projetocorridas.model.Corrida;
+import com.projetocorridas.projetocorridas.repository.CorridaRepository;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class CorridaService {
 
-    private Map<UUID, CorridaDto> corridasMap = new HashMap<>();
+    @Autowired
+    private CorridaRepository corridaRepository;
+
+    // Converter DTO para Entity
+    private Corrida dtoToEntity(CorridaDto dto) {
+        Corrida corrida = new Corrida();
+        corrida.setId(dto.getId());
+        corrida.setTitulo(dto.getTitulo());
+        corrida.setDescricao(dto.getDescricao());
+        corrida.setTempo(dto.getTempo());
+        return corrida;
+    }
+
+    // Converter Entity para DTO
+    private CorridaDto entityToDto(Corrida entity) {
+        return CorridaDto.builder()
+                .id(entity.getId())
+                .titulo(entity.getTitulo())
+                .descricao(entity.getDescricao())
+                .tempo(entity.getTempo())
+                .perguntas(new ArrayList<>())
+                .build();
+    }
 
     // Criar nova corrida
     public CorridaDto criar(CorridaDto corridaDto) {
@@ -22,33 +47,49 @@ public class CorridaService {
         if (corridaDto.getPerguntas() == null) {
             corridaDto.setPerguntas(new ArrayList<>());
         }
-        corridasMap.put(corridaDto.getId(), corridaDto);
-        return corridaDto;
+        Corrida corrida = dtoToEntity(corridaDto);
+        Corrida salva = corridaRepository.save(corrida);
+        return entityToDto(salva);
     }
 
     // Obter corrida por ID
     public CorridaDto obter(UUID id) {
-        validarCorridaExiste(id);
-        return corridasMap.get(id);
+        Corrida corrida = corridaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Corrida com ID " + id + " não encontrada"));
+        return entityToDto(corrida);
     }
 
     // Listar todas as corridas
     public List<CorridaDto> listarTodas() {
-        return new ArrayList<>(corridasMap.values());
+        return corridaRepository.findAll().stream()
+                .map(this::entityToDto)
+                .collect(Collectors.toList());
     }
 
     // Alterar corrida existente
     public CorridaDto alterar(CorridaDto corridaDto) {
-        validarCorridaExiste(corridaDto.getId());
-        verificaNomeDuplicado(corridaDto.getTitulo());
-        corridasMap.put(corridaDto.getId(), corridaDto);
-        return corridaDto;
+        UUID id = corridaDto.getId();
+        Corrida corridaExistente = corridaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Corrida com ID " + id + " não encontrada"));
+
+        // Verifica duplicação de título apenas se o título foi alterado
+        if (!corridaExistente.getTitulo().equals(corridaDto.getTitulo())) {
+            verificaNomeDuplicado(corridaDto.getTitulo());
+        }
+
+        corridaExistente.setTitulo(corridaDto.getTitulo());
+        corridaExistente.setDescricao(corridaDto.getDescricao());
+        corridaExistente.setTempo(corridaDto.getTempo());
+
+        Corrida atualizada = corridaRepository.save(corridaExistente);
+        return entityToDto(atualizada);
     }
 
     // Apagar corrida
     public void apagar(UUID id) {
-        validarCorridaExiste(id);
-        corridasMap.remove(id);
+        corridaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Corrida com ID " + id + " não encontrada"));
+        corridaRepository.deleteById(id);
     }
 
     // Validar corrida DTO
@@ -65,35 +106,28 @@ public class CorridaService {
         }
     }
 
-    // Validar se corrida existe
-    private void validarCorridaExiste(UUID id) {
-        if (!corridasMap.containsKey(id)) {
-            throw new IllegalArgumentException("Corrida com ID " + id + " não encontrada");
-        }
-    }
-
     public void verificaNomeDuplicado(String titulo) {
-        for (CorridaDto corrida : corridasMap.values()) {
-            if (corrida.getTitulo().equalsIgnoreCase(titulo)) {
-                throw new IllegalArgumentException("Título de corrida já existe: " + titulo);
-            }
-        }
+        corridaRepository.findByTitulo(titulo).ifPresent(c -> {
+            throw new IllegalArgumentException("Título de corrida já existe: " + titulo);
+        });
     }
 
     // Adicionar pergunta à corrida
     public void adicionarPergunta(UUID corridaId, PerguntaDto perguntaDto) {
-        CorridaDto corrida = corridasMap.get(corridaId);
-        if (corrida != null && corrida.getPerguntas() != null) {
-            corrida.getPerguntas().add(perguntaDto);
-        }
+        // Valida se a corrida existe
+        corridaRepository.findById(corridaId)
+                .orElseThrow(() -> new IllegalArgumentException("Corrida com ID " + corridaId + " não encontrada"));
+        // Método existe por compatibilidade, mas a lógica de adicionar pergunta é
+        // handled pelo PerguntaService
     }
 
     // Remover pergunta da corrida
     public void removerPergunta(UUID corridaId, UUID perguntaId) {
-        CorridaDto corrida = corridasMap.get(corridaId);
-        if (corrida != null && corrida.getPerguntas() != null) {
-            corrida.getPerguntas().removeIf(p -> p.getId().equals(perguntaId));
-        }
+        // Valida se a corrida existe
+        corridaRepository.findById(corridaId)
+                .orElseThrow(() -> new IllegalArgumentException("Corrida com ID " + corridaId + " não encontrada"));
+        // Método existe por compatibilidade, mas a lógica de remover pergunta é handled
+        // pelo PerguntaService
     }
 
 }

@@ -14,7 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class PerguntaDto {
     private UUID id;
-    private long corridaId;
+    private UUID corridaId;
     private String enunciado;
     private long respostaCorreta;
     private List<AlternativaDto> alternativas;

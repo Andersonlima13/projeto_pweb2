@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "perguntas")
@@ -19,9 +20,9 @@ import java.util.List;
 @AllArgsConstructor
 public class Pergunta {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private Long corridaId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+    private UUID corridaId;
     private String enunciado;
     private Integer respostaCorreta;
 
