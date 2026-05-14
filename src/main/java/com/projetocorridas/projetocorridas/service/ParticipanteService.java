@@ -7,7 +7,6 @@ import com.projetocorridas.projetocorridas.dto.ParticipanteDto;
 import com.projetocorridas.projetocorridas.model.Participante;
 import com.projetocorridas.projetocorridas.repository.ParticipanteRepository;
 
-import java.util.Optional;
 import java.util.UUID;
 import java.util.List;
 import java.util.stream.Collectors;

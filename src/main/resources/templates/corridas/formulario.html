@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${acao} + ' Corrida - Projeto Corridas'"></title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">Projeto Corridas</span>
+            <div class="d-flex">
+                <span class="text-white me-3" th:if="${session.usuarioLogado != null}">
+                    Bem-vindo, <span th:text="${session.usuarioLogado.nome}"></span>
+                </span>
+                <a th:href="@{/auth/logout}" class="btn btn-outline-light btn-sm">Sair</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <!-- Mensagens de Erro -->
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${erro}">
+            <span th:text="${erro}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0" th:text="${acao} + ' Corrida'"></h5>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/corridas}" method="POST" th:object="${corridaDto}">
+                            <!-- id (oculto para edição) -->
+                            <input type="hidden" th:if="${corridaDto.id != null}" 
+                                   th:field="*{id}" />
+
+                            <!-- Título -->
+                            <div class="mb-3">
+                                <label for="titulo" class="form-label">Título</label>
+                                <input type="text" class="form-control" id="titulo" 
+                                       th:field="*{titulo}" placeholder="Digite o título da corrida" required>
+                                <small class="form-text text-muted">O título deve ser único</small>
+                            </div>
+
+                            <!-- Descrição -->
+                            <div class="mb-3">
+                                <label for="descricao" class="form-label">Descrição</label>
+                                <textarea class="form-control" id="descricao" rows="4" 
+                                          th:field="*{descricao}" placeholder="Digite a descrição da corrida" required></textarea>
+                            </div>
+
+                            <!-- Tempo -->
+                            <div class="mb-3">
+                                <label for="tempo" class="form-label">Tempo (segundos)</label>
+                                <input type="number" class="form-control" id="tempo" 
+                                       th:field="*{tempo}" placeholder="Digite o tempo em segundos" required>
+                                <small class="form-text text-muted">Tempo em segundos para a corrida</small>
+                            </div>
+
+                            <!-- Botões -->
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary" th:text="${acao}"></button>
+                                <a th:href="@{/corridas}" class="btn btn-secondary">Cancelar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Instruções -->
+                <div class="alert alert-info mt-4">
+                    <h6>Informações:</h6>
+                    <ul class="mb-0">
+                        <li>Todos os campos são obrigatórios</li>
+                        <li>O título deve ser único no sistema</li>
+                        <li>O tempo deve ser informado em segundos</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        // Se for edição, ajustar a action do formulário
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const corridaId = document.querySelector('input[name="id"]');
+            
+            if (corridaId && corridaId.value) {
+                form.action = '[[@{/corridas/}]]' + corridaId.value;
+                form.method = 'POST';
+            }
+        });
+    </script>
+</body>
+</html>

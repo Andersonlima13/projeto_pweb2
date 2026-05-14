@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Corridas - Projeto Corridas</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">Projeto Corridas</span>
+            <div class="d-flex">
+                <span class="text-white me-3" th:if="${session.usuarioLogado != null}">
+                    Bem-vindo, <span th:text="${session.usuarioLogado.nome}"></span>
+                </span>
+                <a th:href="@{/auth/logout}" class="btn btn-outline-light btn-sm">Sair</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <!-- Mensagens de Sucesso -->
+        <div class="alert alert-success alert-dismissible fade show" role="alert" th:if="${mensagem}">
+            <span th:text="${mensagem}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Mensagens de Erro -->
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${erro}">
+            <span th:text="${erro}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Corridas</h1>
+            <a th:href="@{/corridas/novo}" class="btn btn-primary">+ Nova Corrida</a>
+        </div>
+
+        <!-- Tabela de Corridas -->
+        <div class="table-responsive">
+            <table class="table table-striped table-hover" th:if="${corridas.size() > 0}">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Título</th>
+                        <th>Descrição</th>
+                        <th>Tempo (s)</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="corrida : ${corridas}">
+                        <td>
+                            <a th:href="@{/corridas/{id}(id=${corrida.id})}" th:text="${corrida.titulo}"></a>
+                        </td>
+                        <td th:text="${corrida.descricao}"></td>
+                        <td th:text="${corrida.tempo}"></td>
+                        <td>
+                            <a th:href="@{/corridas/{id}/editar(id=${corrida.id})}" class="btn btn-sm btn-warning">Editar</a>
+                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" 
+                                    th:data-bs-target="'#confirmarDelecao' + ${corrida.id}">
+                                Deletar
+                            </button>
+
+                            <!-- Modal de Confirmação de Deleção -->
+                            <div class="modal fade" th:id="'confirmarDelecao' + ${corrida.id}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Confirmar Deleção</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Você tem certeza que deseja deletar a corrida <strong th:text="${corrida.titulo}"></strong>?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <form th:action="@{/corridas/{id}/deletar(id=${corrida.id})}" method="POST" style="display: inline;">
+                                                <button type="submit" class="btn btn-danger">Deletar</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Mensagem quando não há corridas -->
+        <div class="alert alert-info" th:if="${corridas.size() == 0}">
+            Nenhuma corrida cadastrada. <a th:href="@{/corridas/novo}">Clique aqui</a> para criar uma.
+        </div>
+
+        <hr>
+        <div class="mt-4">
+            <a th:href="@{/lobby}" class="btn btn-secondary">Voltar ao Lobby</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
