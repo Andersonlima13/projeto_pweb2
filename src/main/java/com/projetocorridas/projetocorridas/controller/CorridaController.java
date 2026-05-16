@@ -34,11 +34,8 @@ public class CorridaController {
 
     @GetMapping("/novo")
     public ModelAndView formularioCriar() {
-        ModelAndView mv = new ModelAndView("corridas/listar");
-        List<CorridaDto> corridas = corridaService.listarTodas();
-        mv.addObject("corridas", corridas);
+        ModelAndView mv = new ModelAndView("corridas/formulario");
         mv.addObject("corridaDto", new CorridaDto());
-        mv.addObject("openModal", true);
         return mv;
     }
 

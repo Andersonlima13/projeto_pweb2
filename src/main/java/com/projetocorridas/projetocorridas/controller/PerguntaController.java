@@ -95,6 +95,7 @@ public class PerguntaController {
             PerguntaDto perguntaDto = new PerguntaDto();
             perguntaDto.setCorridaId(corridaId);
             perguntaDto.setRespostaCorreta(0);
+            perguntaDto.setTempo(30);
             prepararAlternativasFormulario(perguntaDto);
             mv.addObject("corrida", corrida);
             mv.addObject("perguntaDto", perguntaDto);
@@ -106,11 +107,13 @@ public class PerguntaController {
     }
 
     @PostMapping("/salvar")
-    public String salvar(@PathVariable UUID corridaId, @ModelAttribute PerguntaDto perguntaDto) {
+    public String salvar(@PathVariable UUID corridaId, @ModelAttribute PerguntaDto perguntaDto,
+            RedirectAttributes redirectAttributes) {
         try {
             perguntaDto.setCorridaId(corridaId);
             List<AlternativaDto> alternativas = alternativasValidas(perguntaDto.getAlternativas());
             perguntaDto.setRespostaCorreta(contarAlternativasCorretas(alternativas));
+            perguntaDto.setTempo(normalizarTempo(perguntaDto.getTempo()));
 
             if (perguntaDto.getId() != null) {
                 perguntaService.alterar(perguntaDto);
@@ -120,8 +123,10 @@ public class PerguntaController {
                 alternativaService.substituirPorPergunta(perguntaCriada.getId(), alternativas);
             }
 
+            redirectAttributes.addFlashAttribute("mensagem", "Pergunta criada com sucesso.");
             return "redirect:/corridas/" + corridaId + "/perguntas";
         } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("erro", e.getMessage());
             if (perguntaDto.getId() != null) {
                 return "redirect:/corridas/" + corridaId + "/perguntas/editar/" + perguntaDto.getId();
             }
@@ -130,8 +135,9 @@ public class PerguntaController {
     }
 
     @PostMapping
-    public String criar(@PathVariable UUID corridaId, @ModelAttribute PerguntaDto perguntaDto) {
-        return salvar(corridaId, perguntaDto);
+    public String criar(@PathVariable UUID corridaId, @ModelAttribute PerguntaDto perguntaDto,
+            RedirectAttributes redirectAttributes) {
+        return salvar(corridaId, perguntaDto, redirectAttributes);
     }
 
     @GetMapping("/{perguntaId}")
@@ -168,9 +174,9 @@ public class PerguntaController {
 
     @PostMapping("/{perguntaId}")
     public String alterar(@PathVariable UUID corridaId, @PathVariable UUID perguntaId,
-            @ModelAttribute PerguntaDto perguntaDto) {
+            @ModelAttribute PerguntaDto perguntaDto, RedirectAttributes redirectAttributes) {
         perguntaDto.setId(perguntaId);
-        return salvar(corridaId, perguntaDto);
+        return salvar(corridaId, perguntaDto, redirectAttributes);
     }
 
     @GetMapping("/apagar/{perguntaId}")
@@ -230,5 +236,12 @@ public class PerguntaController {
         return alternativas.stream()
                 .filter(alternativa -> Boolean.TRUE.equals(alternativa.getIsCorreta()))
                 .count();
+    }
+
+    private Integer normalizarTempo(Integer tempo) {
+        if (tempo == null) {
+            return 30;
+        }
+        return Math.max(tempo, 30);
     }
 }

@@ -112,8 +112,11 @@ public class PerguntaService {
         if (perguntaDto.getEnunciado() == null || perguntaDto.getEnunciado().trim().isEmpty()) {
             throw new IllegalArgumentException("Enunciado é obrigatório");
         }
-        if (perguntaDto.getRespostaCorreta() < 0) {
-            throw new IllegalArgumentException("Quantidade de respostas corretas não pode ser negativa");
+        if (perguntaDto.getRespostaCorreta() <= 0) {
+            throw new IllegalArgumentException("É necessário informar ao menos uma alternativa correta");
+        }
+        if (perguntaDto.getTempo() == null || perguntaDto.getTempo() < 30) {
+            throw new IllegalArgumentException("O tempo mínimo da pergunta é de 30 segundos");
         }
     }
 }

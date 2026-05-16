@@ -3,113 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="${acao} + ' Pergunta - Projeto Corridas'">Pergunta</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/corridas.css}">
+    <link rel="stylesheet" th:href="@{/css/perguntas.css}">
 </head>
 <body>
-    <nav class="navbar navbar-dark bg-dark">
-        <div class="container-fluid">
-            <span class="navbar-brand mb-0 h1">Projeto Corridas</span>
-            <div class="d-flex">
-                <span class="text-white me-3" th:if="${session.usuarioLogado != null}">
-                    Bem-vindo, <span th:text="${session.usuarioLogado.nome}"></span>
-                </span>
-                <a th:href="@{/auth/logout}" class="btn btn-outline-light btn-sm">Sair</a>
-            </div>
+    <nav class="navbar-custom">
+        <a th:href="@{/lobby}" class="navbar-brand-custom">
+            <i class="bi bi-code-slash"></i> Corridas de programação
+        </a>
+        <div class="d-flex align-items-center">
+            <a th:href="@{/auth/logout}" class="btn-logout">
+                <i class="bi bi-box-arrow-right"></i> Sair
+            </a>
         </div>
     </nav>
 
-    <main class="container mt-5">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a th:href="@{/corridas}">Corridas</a></li>
-                <li class="breadcrumb-item">
-                    <a th:href="@{/corridas/{id}(id=${corrida.id})}" th:text="${corrida.titulo}">Corrida</a>
-                </li>
-                <li class="breadcrumb-item">
-                    <a th:href="@{/corridas/{corridaId}/perguntas(corridaId=${corrida.id})}">Perguntas</a>
-                </li>
-                <li class="breadcrumb-item active" th:text="${acao}">Ação</li>
-            </ol>
-        </nav>
+    <main class="pergunta-form-page">
+        <div class="message-area" th:if="${erro}">
+            <div class="message-error" th:text="${erro}"></div>
+        </div>
 
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0" th:text="${acao} + ' Pergunta'">Pergunta</h5>
+        <div class="page-header">
+            <div class="header-title">
+                <h1 th:text="${acao} + ' pergunta'">Criar pergunta</h1>
+                <p th:text="${corrida.titulo}">Corrida</p>
+            </div>
+        </div>
+
+        <div class="pergunta-form-shell">
+            <div class="pergunta-form-header">
+                <h2>Dados da pergunta</h2>
+                <p>Defina o enunciado, o tempo e as alternativas da questão.</p>
+            </div>
+
+            <form th:action="@{/corridas/{corridaId}/perguntas/salvar(corridaId=${corrida.id})}"
+                  th:object="${perguntaDto}" method="POST" id="perguntaForm" novalidate>
+                <input type="hidden" th:field="*{id}">
+                <input type="hidden" th:field="*{corridaId}">
+                <input type="hidden" th:field="*{respostaCorreta}" id="respostaCorreta">
+                <input type="hidden" th:field="*{tempo}" id="tempoTotalSegundos">
+
+                <div class="pergunta-form-group">
+                    <label for="enunciado">Enunciado</label>
+                    <textarea class="pergunta-form-textarea" id="enunciado" rows="4"
+                              th:field="*{enunciado}" placeholder="Digite o enunciado da pergunta" required></textarea>
+                </div>
+
+                <div class="pergunta-form-card">
+                    <div class="pergunta-form-card-header">
+                        <div>
+                            <h3>Tempo da pergunta</h3>
+                            <p>Informe minutos e segundos. O valor será salvo em segundos.</p>
+                        </div>
+                        <div class="tempo-preview" id="tempoPreview">30 segundos</div>
                     </div>
-                    <div class="card-body">
-                        <form th:action="@{/corridas/{corridaId}/perguntas/salvar(corridaId=${corrida.id})}"
-                              th:object="${perguntaDto}" method="POST">
-                            <input type="hidden" th:field="*{id}">
-                            <input type="hidden" th:field="*{corridaId}">
-                            <input type="hidden" th:field="*{respostaCorreta}" id="respostaCorreta">
 
-                            <div class="mb-4">
-                                <label for="enunciado" class="form-label">Enunciado</label>
-                                <textarea class="form-control" id="enunciado" rows="4"
-                                          th:field="*{enunciado}" required></textarea>
+                    <div class="tempo-grid">
+                        <div class="pergunta-form-group">
+                            <label for="tempoMinutos">Minutos</label>
+                            <input type="number" class="pergunta-form-input" id="tempoMinutos" min="0" step="1" value="0">
+                        </div>
+                        <div class="pergunta-form-group">
+                            <label for="tempoSegundos">Segundos</label>
+                            <input type="number" class="pergunta-form-input" id="tempoSegundos" min="0" max="59" step="1" value="30">
+                        </div>
+                    </div>
+                    <div class="form-hint" id="tempoHint">Tempo mínimo: 30 segundos.</div>
+                </div>
+
+                <div class="pergunta-form-card">
+                    <div class="pergunta-form-card-header align-start">
+                        <div>
+                            <h3>Alternativas</h3>
+                            <p>Adicione as opções e marque as corretas.</p>
+                        </div>
+                        <div class="alternativas-status">
+                            <span>Corretas: <strong id="contadorCorretas">0</strong></span>
+                            <span>Ativas: <strong id="contadorAlternativas">0</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="pergunta-actions-row">
+                        <button type="button" class="corrida-form-btn-primary" id="adicionarAlternativa">
+                            <i class="bi bi-plus-lg"></i> Adicionar alternativa
+                        </button>
+                    </div>
+
+                    <div id="alternativas">
+                        <div class="alternativa-item" th:each="alternativa, stat : *{alternativas}">
+                            <input type="hidden" th:field="*{alternativas[__${stat.index}__].id}">
+                            <input type="hidden" th:field="*{alternativas[__${stat.index}__].perguntaId}">
+
+                            <div class="pergunta-form-group">
+                                <label th:for="${'alternativaDescricao' + stat.index}">Descrição</label>
+                                <input type="text" class="pergunta-form-input descricao-alternativa"
+                                       th:id="${'alternativaDescricao' + stat.index}"
+                                       th:field="*{alternativas[__${stat.index}__].descricao}"
+                                       placeholder="Digite a alternativa">
                             </div>
 
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div>
-                                    <h6 class="mb-0">Alternativas</h6>
-                                    <span class="text-muted small">Respostas corretas: <span id="contadorCorretas">0</span></span>
-                                </div>
-                                <button type="button" class="btn btn-outline-primary btn-sm" id="adicionarAlternativa">
-                                    Adicionar Alternativa
+                            <div class="alternativa-footer">
+                                <label class="check-inline">
+                                    <input type="checkbox" class="correta-alternativa"
+                                           th:id="${'alternativaCorreta' + stat.index}"
+                                           th:field="*{alternativas[__${stat.index}__].isCorreta}">
+                                    <span>Correta</span>
+                                </label>
+                                <button type="button" class="corrida-form-btn-secondary remover-alternativa">
+                                    Remover
                                 </button>
                             </div>
+                        </div>
+                    </div>
 
-                            <div id="alternativas">
-                                <div class="border rounded p-3 mb-3 alternativa-item"
-                                     th:each="alternativa, stat : *{alternativas}">
-                                    <input type="hidden" th:field="*{alternativas[__${stat.index}__].id}">
-                                    <input type="hidden" th:field="*{alternativas[__${stat.index}__].perguntaId}">
-
-                                    <div class="mb-3">
-                                        <label class="form-label"
-                                               th:for="${'alternativaDescricao' + stat.index}">Descrição</label>
-                                        <input type="text" class="form-control descricao-alternativa"
-                                               th:id="${'alternativaDescricao' + stat.index}"
-                                               th:field="*{alternativas[__${stat.index}__].descricao}">
-                                    </div>
-
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="form-check mb-0">
-                                            <input type="checkbox" class="form-check-input correta-alternativa"
-                                                   th:id="${'alternativaCorreta' + stat.index}"
-                                                   th:field="*{alternativas[__${stat.index}__].isCorreta}">
-                                            <label class="form-check-label"
-                                                   th:for="${'alternativaCorreta' + stat.index}">Correta</label>
-                                        </div>
-                                        <button type="button" class="btn btn-outline-danger btn-sm remover-alternativa">
-                                            Remover
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="d-flex gap-2 mt-4">
-                                <button type="submit" class="btn btn-primary">Salvar</button>
-                                <a th:href="@{/corridas/{corridaId}/perguntas(corridaId=${corrida.id})}"
-                                   class="btn btn-secondary">Cancelar</a>
-                            </div>
-                        </form>
+                    <div class="form-hint form-hint-error" id="alternativasHint" style="display:none;">
+                        É necessário marcar ao menos uma alternativa correta.
                     </div>
                 </div>
-            </div>
+
+                <div class="corrida-form-actions">
+                    <button type="submit" class="corrida-form-btn-primary">Salvar pergunta</button>
+                    <a th:href="@{/corridas/{corridaId}/perguntas(corridaId=${corrida.id})}"
+                       class="corrida-form-btn-secondary">Cancelar</a>
+                </div>
+            </form>
         </div>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const container = document.getElementById('alternativas');
             const adicionar = document.getElementById('adicionarAlternativa');
             const respostaCorreta = document.getElementById('respostaCorreta');
             const contadorCorretas = document.getElementById('contadorCorretas');
+            const contadorAlternativas = document.getElementById('contadorAlternativas');
+            const alternativasHint = document.getElementById('alternativasHint');
+            const tempoMinutos = document.getElementById('tempoMinutos');
+            const tempoSegundos = document.getElementById('tempoSegundos');
+            const tempoTotalSegundos = document.getElementById('tempoTotalSegundos');
+            const tempoPreview = document.getElementById('tempoPreview');
+            const tempoHint = document.getElementById('tempoHint');
+            const form = document.getElementById('perguntaForm');
             let indice = container.querySelectorAll('.alternativa-item').length;
+
+            function normalizarNumero(valor, fallback) {
+                const numero = Number.parseInt(valor, 10);
+                return Number.isNaN(numero) ? fallback : numero;
+            }
+
+            function sincronizarTempo() {
+                const minutos = Math.max(0, normalizarNumero(tempoMinutos.value, 0));
+                let segundos = Math.max(0, normalizarNumero(tempoSegundos.value, 0));
+
+                if (segundos > 59) {
+                    segundos = 59;
+                    tempoSegundos.value = 59;
+                }
+
+                const total = (minutos * 60) + segundos;
+                tempoTotalSegundos.value = total;
+                tempoPreview.textContent = `${minutos}m ${segundos}s (${total} segundos)`;
+
+                if (total < 30) {
+                    tempoHint.textContent = 'O tempo mínimo é de 30 segundos.';
+                    tempoHint.classList.add('form-hint-error');
+                } else {
+                    tempoHint.textContent = 'Tempo mínimo: 30 segundos.';
+                    tempoHint.classList.remove('form-hint-error');
+                }
+            }
+
+            function carregarTempoInicial() {
+                const totalInicial = Math.max(30, normalizarNumero(tempoTotalSegundos.value, 30));
+                const minutosIniciais = Math.floor(totalInicial / 60);
+                const segundosIniciais = totalInicial % 60;
+
+                tempoMinutos.value = minutosIniciais;
+                tempoSegundos.value = segundosIniciais;
+                tempoTotalSegundos.value = totalInicial;
+            }
 
             function atualizarContagem() {
                 const corretas = Array.from(container.querySelectorAll('.alternativa-item'))
@@ -119,37 +192,45 @@
                         return descricao && descricao.value.trim() !== '' && correta && correta.checked;
                     }).length;
 
+                const ativas = Array.from(container.querySelectorAll('.alternativa-item'))
+                    .filter(function (item) {
+                        const descricao = item.querySelector('.descricao-alternativa');
+                        return descricao && descricao.value.trim() !== '';
+                    }).length;
+
                 respostaCorreta.value = corretas;
                 contadorCorretas.textContent = corretas;
+                contadorAlternativas.textContent = ativas;
+                alternativasHint.style.display = corretas > 0 ? 'none' : 'block';
             }
 
             function criarAlternativa() {
                 const item = document.createElement('div');
-                item.className = 'border rounded p-3 mb-3 alternativa-item';
+                item.className = 'alternativa-item';
                 item.innerHTML = `
                     <input type="hidden" name="alternativas[${indice}].id">
                     <input type="hidden" name="alternativas[${indice}].perguntaId">
-                    <div class="mb-3">
-                        <label class="form-label" for="alternativaDescricao${indice}">Descrição</label>
-                        <input type="text" class="form-control descricao-alternativa"
+                    <div class="pergunta-form-group">
+                        <label for="alternativaDescricao${indice}">Descrição</label>
+                        <input type="text" class="pergunta-form-input descricao-alternativa"
                                id="alternativaDescricao${indice}" name="alternativas[${indice}].descricao">
                     </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="form-check mb-0">
-                            <input type="checkbox" class="form-check-input correta-alternativa"
+                    <div class="alternativa-footer">
+                        <label class="check-inline">
+                            <input type="checkbox" class="correta-alternativa"
                                    id="alternativaCorreta${indice}" name="alternativas[${indice}].isCorreta" value="true">
-                            <label class="form-check-label" for="alternativaCorreta${indice}">Correta</label>
-                        </div>
-                        <button type="button" class="btn btn-outline-danger btn-sm remover-alternativa">Remover</button>
+                            <span>Correta</span>
+                        </label>
+                        <button type="button" class="corrida-form-btn-secondary remover-alternativa">Remover</button>
                     </div>
                 `;
                 container.appendChild(item);
                 indice++;
+                atualizarContagem();
             }
 
             adicionar.addEventListener('click', function () {
                 criarAlternativa();
-                atualizarContagem();
             });
 
             container.addEventListener('click', function (event) {
@@ -166,6 +247,23 @@
 
             container.addEventListener('input', atualizarContagem);
             container.addEventListener('change', atualizarContagem);
+            tempoMinutos.addEventListener('input', sincronizarTempo);
+            tempoSegundos.addEventListener('input', sincronizarTempo);
+            form.addEventListener('submit', function (event) {
+                sincronizarTempo();
+                atualizarContagem();
+
+                const totalTempo = normalizarNumero(tempoTotalSegundos.value, 0);
+                const corretas = normalizarNumero(respostaCorreta.value, 0);
+
+                if (totalTempo < 30 || corretas <= 0) {
+                    event.preventDefault();
+                    alternativasHint.style.display = corretas <= 0 ? 'block' : 'none';
+                }
+            });
+
+            carregarTempoInicial();
+            sincronizarTempo();
             atualizarContagem();
         });
     </script>
