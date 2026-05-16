@@ -26,6 +26,7 @@ public class Pergunta {
     private UUID corridaId;
     private String enunciado;
     private Integer respostaCorreta;
+    private Integer tempo;
 
     @OneToMany(mappedBy = "pergunta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Alternativa> alternativas;

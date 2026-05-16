@@ -17,6 +17,7 @@ public class PerguntaDto {
     private UUID corridaId;
     private String enunciado;
     private long respostaCorreta;
+    private Integer tempo;
     private List<AlternativaDto> alternativas;
 
 }
