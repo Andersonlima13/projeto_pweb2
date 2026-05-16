@@ -69,15 +69,7 @@ public class CorridaController {
 
     @GetMapping("/{id}/editar")
     public ModelAndView formularioEditar(@PathVariable UUID id) {
-        ModelAndView mv = new ModelAndView("corridas/formulario");
-        try {
-            CorridaDto corrida = corridaService.obter(id);
-            mv.addObject("corridaDto", corrida);
-            mv.addObject("acao", "Editar");
-        } catch (IllegalArgumentException e) {
-            mv.setViewName("redirect:/corridas");
-        }
-        return mv;
+        return new ModelAndView("redirect:/corridas/" + id + "/perguntas");
     }
 
     @PostMapping("/{id}")
@@ -87,7 +79,7 @@ public class CorridaController {
             corridaService.alterar(corridaDto);
             return "redirect:/corridas/" + id;
         } catch (IllegalArgumentException e) {
-            return "redirect:/corridas/" + id + "/editar";
+            return "redirect:/corridas/" + id + "/perguntas";
         }
     }
 

@@ -90,7 +90,7 @@
                         <div class="d-grid gap-2">
                             <a th:href="@{/corridas/{corridaId}/perguntas(corridaId=${corrida.id})}" class="btn btn-info text-white">Gerenciar Perguntas</a>
                             <a th:href="@{/corridas/{corridaId}/perguntas/novo(corridaId=${corrida.id})}" class="btn btn-outline-primary">Nova Pergunta</a>
-                            <a th:href="@{/corridas/{id}/editar(id=${corrida.id})}" class="btn btn-warning">Editar</a>
+                            <a th:href="@{/corridas/{corridaId}/perguntas(corridaId=${corrida.id})}" class="btn btn-warning">Editar nome</a>
                             <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmarDelecao">
                                 Deletar
                             </button>
@@ -126,7 +126,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <form th:action="@{/corridas/{id}/deletar(id=${corrida.id})}" method="POST" style="display: inline;">
+                    <form th:action="@{/corridas/{corridaId}/perguntas/excluir(corridaId=${corrida.id})}" method="POST" style="display: inline;">
                         <button type="submit" class="btn btn-danger">Deletar Corrida</button>
                     </form>
                 </div>

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.projetocorridas.projetocorridas.dto.AlternativaDto;
 import com.projetocorridas.projetocorridas.dto.PerguntaDto;
@@ -51,6 +52,39 @@ public class PerguntaController {
             mv.setViewName("redirect:/corridas");
         }
         return mv;
+    }
+
+    @PostMapping("/editar")
+    public String editarCorrida(@PathVariable UUID corridaId,
+            @RequestParam String titulo,
+            @RequestParam String descricao,
+            RedirectAttributes redirectAttributes) {
+        try {
+            String tituloLimpo = titulo == null ? null : titulo.trim();
+            String descricaoLimpa = descricao == null ? null : descricao.trim();
+            CorridaDto corridaDto = CorridaDto.builder()
+                    .id(corridaId)
+                    .titulo(tituloLimpo)
+                    .descricao(descricaoLimpa)
+                    .build();
+            corridaService.alterar(corridaDto);
+            redirectAttributes.addFlashAttribute("mensagem", "Nome da corrida atualizado.");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("erro", e.getMessage());
+        }
+        return "redirect:/corridas/" + corridaId + "/perguntas";
+    }
+
+    @PostMapping("/excluir")
+    public String excluirCorrida(@PathVariable UUID corridaId, RedirectAttributes redirectAttributes) {
+        try {
+            corridaService.apagar(corridaId);
+            redirectAttributes.addFlashAttribute("mensagem", "Corrida excluida com sucesso.");
+            return "redirect:/corridas";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("erro", e.getMessage());
+            return "redirect:/corridas/" + corridaId + "/perguntas";
+        }
     }
 
     @GetMapping("/novo")

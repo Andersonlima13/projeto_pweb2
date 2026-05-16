@@ -22,16 +22,54 @@
      text-decoration: underline;
  }
  
- .breadcrumb-trail i {
-     font-size: 0.75rem;
- }
- 
- .perguntas-title-row {
-     display: flex;
-     gap: 1rem;
-     align-items: center;
-     margin: 1rem 0 1.75rem;
- }
+.breadcrumb-trail i {
+    font-size: 0.75rem;
+}
+
+.message-area {
+    margin: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.message-success,
+.message-error {
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.message-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.message-error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.perguntas-title-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin: 1rem 0 1.75rem;
+}
+
+.title-with-edit {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.title-with-edit h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
  
  .perguntas-back {
      width: 42px;
@@ -46,16 +84,99 @@
      background: #ffffff;
  }
  
- .perguntas-back:hover {
-     background: rgba(55, 132, 145, 0.08);
- }
- 
- .info-cards {
-     display: grid;
-     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-     gap: 16px;
-     margin-bottom: 1.5rem;
- }
+.perguntas-back:hover {
+    background: rgba(55, 132, 145, 0.08);
+}
+
+.corrida-actions {
+    justify-content: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+    margin-bottom: 1.75rem;
+}
+
+.rename-form {
+    flex: 1 1 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.rename-form label {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.rename-controls {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.rename-controls .pc-input {
+    flex: 1;
+}
+
+.pc-btn-danger {
+    background: var(--danger-color);
+    color: var(--text-light);
+    border: none;
+    padding: 0.7rem 1.25rem;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.pc-btn-danger:hover {
+    background: #b52a37;
+}
+
+.btn-edit-inline {
+    background-color: var(--primary-dark);
+    color: var(--text-light);
+    border: none;
+    padding: 0.7rem 1.25rem;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.95rem;
+}
+
+.btn-edit-inline:hover {
+    background-color: var(--header-bg);
+}
+
+.pc-btn-cancel {
+    background: transparent;
+    color: var(--text-dark);
+    border: 1px solid #dcdcdc;
+    padding: 0.7rem 1.25rem;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+}
+
+.pc-btn-cancel:hover {
+    background: rgba(0,0,0,0.03);
+    color: var(--text-dark);
+}
+
+.info-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 1.5rem;
+}
  
  .info-card {
      background: var(--card-bg);
@@ -225,34 +346,44 @@
      background: rgba(220, 53, 69, 0.08);
  }
  
- @media (max-width: 900px) {
-     .pergunta-item {
-         grid-template-columns: 46px 1fr;
-     }
- 
-     .pergunta-content,
-     .pergunta-alternativas,
-     .pergunta-actions {
-         grid-column: 2;
-     }
- 
-     .pergunta-actions {
-         align-self: start;
-     }
- }
- 
- @media (max-width: 600px) {
-     .perguntas-card-header {
-         flex-direction: column;
-         align-items: flex-start;
-     }
- 
-     .info-cards {
-         grid-template-columns: 1fr;
-     }
- 
-     .perguntas-title-row {
-         flex-direction: column;
-         align-items: flex-start;
-     }
- }
+@media (max-width: 900px) {
+    .pergunta-item {
+        grid-template-columns: 46px 1fr;
+    }
+
+    .pergunta-content,
+    .pergunta-alternativas,
+    .pergunta-actions {
+        grid-column: 2;
+    }
+
+    .pergunta-actions {
+        align-self: start;
+    }
+}
+
+@media (max-width: 600px) {
+    .perguntas-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .info-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .perguntas-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .corrida-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .rename-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

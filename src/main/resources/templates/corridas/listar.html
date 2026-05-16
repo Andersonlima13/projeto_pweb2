@@ -43,9 +43,10 @@
 
     <!-- Grid de Corridas -->
     <div class="corridas-grid" th:if="${corridas.size() > 0}">
-        <a th:each="corrida : ${corridas}" th:href="@{/corridas/{id}/editar(id=${corrida.id})}" class="card-corrida">
+        <a th:each="corrida : ${corridas}" th:href="@{/corridas/{id}/perguntas(id=${corrida.id})}" class="card-corrida">
             <div class="card-top">
                 <span class="card-id">ID: <span th:text="${#strings.substring(corrida.id.toString(), 0, 8)}"></span></span>
+               
             </div>
             <div class="card-body-custom">
                 <h3 th:text="${corrida.titulo}">Título da Corrida</h3>
@@ -53,7 +54,7 @@
             </div>
             <div class="card-footer-custom">
                 <span class="questions-count">
-                    <i class="bi bi-question-circle-fill"></i>
+                    <i class="bi bi-question-circle-fill"></i> 
                 </span>
                 <i class="bi bi-chevron-right arrow"></i>
             </div>
@@ -66,95 +67,5 @@
         <p>Clique no botão "Nova corrida" para criar sua primeira corrida.</p>
     </div>
 
-    <!-- Modal: Nova Corrida (aberto via /corridas/novo) -->
-    <div id="pcNovaCorridaOverlay"
-         class="pc-modal-overlay"
-         th:classappend="${openModal} ? ' show' : ''">
-        <div class="pc-modal" role="dialog" aria-modal="true" aria-labelledby="pcNovaCorridaTitulo">
-            <div class="pc-modal-header">
-                <h2 id="pcNovaCorridaTitulo">Nova corrida</h2>
-                <a th:href="@{/corridas}" class="pc-modal-close" aria-label="Fechar">&times;</a>
-            </div>
-
-            <form id="pcCorridaForm" th:action="@{/corridas}" method="POST" th:object="${corridaDto}">
-                <div class="pc-modal-body">
-                    <div class="pc-form-group">
-                        <label for="pcTitulo">Título</label>
-                        <input id="pcTitulo" class="pc-input" type="text" th:field="*{titulo}" placeholder="Digite o título" maxlength="120" required>
-                        <div id="pcErrTitulo" class="pc-field-error" style="display:none;">Título é obrigatório.</div>
-                    </div>
-
-                    <div class="pc-form-group">
-                        <label for="pcDescricao">Descrição</label>
-                        <textarea id="pcDescricao" class="pc-textarea" th:field="*{descricao}" placeholder="Digite a descrição" rows="4" maxlength="2000" required></textarea>
-                        <div id="pcErrDescricao" class="pc-field-error" style="display:none;">Descrição é obrigatória.</div>
-                    </div>
-                </div>
-
-                <div class="pc-modal-footer">
-                    <button type="submit" class="pc-btn-primary">Criar</button>
-                    <a th:href="@{/corridas}" class="pc-btn-secondary">Cancelar</a>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script th:inline="javascript">
-        document.addEventListener('DOMContentLoaded', function () {
-            const overlay = document.getElementById('pcNovaCorridaOverlay');
-            const form = document.getElementById('pcCorridaForm');
-            const titulo = document.getElementById('pcTitulo');
-            const descricao = document.getElementById('pcDescricao');
-            const errTitulo = document.getElementById('pcErrTitulo');
-            const errDescricao = document.getElementById('pcErrDescricao');
-            const closeUrl = /*[[@{/corridas}]]*/ '/corridas';
-
-            function show(el, visible) {
-                if (!el) return;
-                el.style.display = visible ? 'block' : 'none';
-            }
-
-            function validate() {
-                if (titulo) titulo.value = titulo.value.trim();
-                if (descricao) descricao.value = descricao.value.trim();
-
-                const tituloOk = !!(titulo && titulo.value);
-                const descOk = !!(descricao && descricao.value);
-
-                show(errTitulo, !tituloOk);
-                show(errDescricao, !descOk);
-
-                return tituloOk && descOk;
-            }
-
-            if (form) {
-                form.addEventListener('submit', function (e) {
-                    if (!validate()) {
-                        e.preventDefault();
-                        form.reportValidity();
-                    }
-                });
-            }
-
-            // Fecha modal ao clicar fora (overlay) ou ao pressionar ESC
-            if (overlay) {
-                if (overlay.classList.contains('show') && titulo) {
-                    titulo.focus();
-                }
-
-                overlay.addEventListener('click', function (e) {
-                    if (e.target === overlay && overlay.classList.contains('show')) {
-                        window.location.href = closeUrl;
-                    }
-                });
-
-                document.addEventListener('keydown', function (e) {
-                    if (e.key === 'Escape' && overlay.classList.contains('show')) {
-                        window.location.href = closeUrl;
-                    }
-                });
-            }
-        });
-    </script>
 </body>
 </html>

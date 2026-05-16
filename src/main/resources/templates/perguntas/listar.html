@@ -26,14 +26,48 @@
             <span th:text="${corrida.titulo}">Corrida</span>
         </div>
 
+
         <div class="perguntas-title-row">
-            <a class="perguntas-back" th:href="@{/corridas/{id}(id=${corrida.id})}" aria-label="Voltar">
+            <a class="perguntas-back" th:href="@{/corridas}" aria-label="Voltar">
                 <i class="bi bi-arrow-left"></i>
             </a>
             <div class="header-title">
-                <h1 th:text="${corrida.titulo}">Corrida</h1>
+                <div class="title-with-edit">
+                    <h1 th:text="${corrida.titulo}">Corrida</h1>
+                    
+                </div>
                 <p th:text="${corrida.descricao}">Descrição</p>
             </div>
+        </div>
+
+        <div class="corrida-actions">
+            <form class="rename-form" id="renameForm"
+                  th:action="@{/corridas/{corridaId}/perguntas/editar(corridaId=${corrida.id})}"
+                  method="POST"
+                  style="display: none;">
+                <label for="tituloCorrida">Nome da corrida</label>
+                <div class="rename-controls">
+                    <input id="tituloCorrida" name="titulo" class="pc-input" type="text"
+                           th:value="${corrida.titulo}" maxlength="120" required>
+                    <input type="hidden" name="descricao" th:value="${corrida.descricao}">
+                    <button type="submit" class="pc-btn-primary">Salvar</button>
+                    <button type="button" id="btnCancelarEdicao" class="pc-btn-cancel">Cancelar</button>
+                </div>
+            </form>
+
+            <form class="delete-form"
+                  th:action="@{/corridas/{corridaId}/perguntas/excluir(corridaId=${corrida.id})}"
+                  method="POST"
+                  onsubmit="return confirm('Tem certeza que deseja excluir esta corrida?');">
+                <button type="submit" class="pc-btn-danger">
+                    <i class="bi bi-trash"></i> Excluir corrida
+                </button>
+
+                <button type="button" id="btnEditarCorrida" class="btn-edit-inline" title="Editar nome da corrida">
+                        <i class="bi bi-pencil"></i> Editar
+                    </button>
+            </form>
+            
         </div>
 
         <div class="info-cards">
@@ -134,5 +168,36 @@
             </div>
         </div>
     </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const btnEditar = document.getElementById('btnEditarCorrida');
+            const btnCancelar = document.getElementById('btnCancelarEdicao');
+            const renameForm = document.querySelector('.rename-form');
+            const titulo = document.getElementById('tituloCorrida');
+
+            if (btnEditar) {
+                btnEditar.addEventListener('click', function () {
+                    renameForm.style.display = 'block';
+                    titulo.focus();
+                });
+            }
+
+            if (btnCancelar) {
+                btnCancelar.addEventListener('click', function () {
+                    renameForm.style.display = 'none';
+                });
+            }
+
+            if (renameForm && titulo) {
+                renameForm.addEventListener('submit', function (e) {
+                    titulo.value = titulo.value.trim();
+                    if (!titulo.value) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
