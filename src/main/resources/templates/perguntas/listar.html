@@ -3,83 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="${corrida.titulo} + ' - Perguntas'">Perguntas</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/corridas.css}">
+    <link rel="stylesheet" th:href="@{/css/perguntas.css}">
 </head>
 <body>
-    <nav class="navbar navbar-dark bg-dark">
-        <div class="container-fluid">
-            <span class="navbar-brand mb-0 h1">Projeto Corridas</span>
-            <div class="d-flex">
-                <span class="text-white me-3" th:if="${session.usuarioLogado != null}">
-                    Bem-vindo, <span th:text="${session.usuarioLogado.nome}"></span>
-                </span>
-                <a th:href="@{/auth/logout}" class="btn btn-outline-light btn-sm">Sair</a>
-            </div>
+    <nav class="navbar-custom">
+        <a th:href="@{/lobby}" class="navbar-brand-custom">
+            <i class="bi bi-code-slash"></i> Corridas de programação
+        </a>
+        <div class="d-flex align-items-center">
+            <a th:href="@{/auth/logout}" class="btn-logout">
+                <i class="bi bi-box-arrow-right"></i> Sair
+            </a>
         </div>
     </nav>
 
-    <main class="container mt-5">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a th:href="@{/corridas}">Corridas</a></li>
-                <li class="breadcrumb-item">
-                    <a th:href="@{/corridas/{id}(id=${corrida.id})}" th:text="${corrida.titulo}">Corrida</a>
-                </li>
-                <li class="breadcrumb-item active">Perguntas</li>
-            </ol>
-        </nav>
+    <main class="perguntas-container">
+        <div class="breadcrumb-trail">
+            <a th:href="@{/corridas}">Gerenciar corridas</a>
+            <i class="bi bi-chevron-right"></i>
+            <span th:text="${corrida.titulo}">Corrida</span>
+        </div>
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h1 class="mb-1" th:text="${corrida.titulo}">Corrida</h1>
-                <p class="text-muted mb-0" th:text="${corrida.descricao}">Descrição</p>
-            </div>
-            <a th:href="@{/corridas/{corridaId}/perguntas/novo(corridaId=${corrida.id})}" class="btn btn-primary">
-                Nova Pergunta
+        <div class="perguntas-title-row">
+            <a class="perguntas-back" th:href="@{/corridas/{id}(id=${corrida.id})}" aria-label="Voltar">
+                <i class="bi bi-arrow-left"></i>
             </a>
+            <div class="header-title">
+                <h1 th:text="${corrida.titulo}">Corrida</h1>
+                <p th:text="${corrida.descricao}">Descrição</p>
+            </div>
         </div>
 
-        <div class="table-responsive" th:if="${!#lists.isEmpty(perguntas)}">
-            <table class="table table-striped table-hover align-middle">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Enunciado</th>
-                        <th>Respostas corretas</th>
-                        <th>Alternativas</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="pergunta : ${perguntas}">
-                        <td>
-                            <a th:href="@{/corridas/{corridaId}/perguntas/{perguntaId}(corridaId=${corrida.id}, perguntaId=${pergunta.id})}"
-                               th:text="${pergunta.enunciado}">Pergunta</a>
-                        </td>
-                        <td th:text="${pergunta.respostaCorreta}">0</td>
-                        <td th:text="${pergunta.alternativas != null ? pergunta.alternativas.size() : 0}">0</td>
-                        <td>
-                            <div class="d-flex flex-wrap gap-2">
-                                <a th:href="@{/corridas/{corridaId}/perguntas/editar/{perguntaId}(corridaId=${corrida.id}, perguntaId=${pergunta.id})}"
-                                   class="btn btn-sm btn-warning">Editar</a>
-                                <a th:href="@{/corridas/{corridaId}/perguntas/{perguntaId}/alternativas(corridaId=${corrida.id}, perguntaId=${pergunta.id})}"
-                                   class="btn btn-sm btn-outline-primary">Alternativas</a>
-                                <a th:href="@{/corridas/{corridaId}/perguntas/apagar/{perguntaId}(corridaId=${corrida.id}, perguntaId=${pergunta.id})}"
-                                   class="btn btn-sm btn-danger"
-                                   onclick="return confirm('Tem certeza que deseja excluir esta pergunta?')">Excluir</a>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="info-cards">
+            <div class="info-card">
+                <div class="info-icon"><i class="bi bi-hash"></i></div>
+                <div>
+                    <div class="info-label">ID da corrida</div>
+                    <div class="info-value" th:text="${#strings.substring(corrida.id.toString(), 0, 8)}">00000000</div>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="info-icon"><i class="bi bi-question-circle"></i></div>
+                <div>
+                    <div class="info-label">Total de perguntas</div>
+                    <div class="info-value" th:text="${totalPerguntas}">0</div>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="info-icon"><i class="bi bi-check2-circle"></i></div>
+                <div>
+                    <div class="info-label">Número de alternativas corretas</div>
+                    <div class="info-value" th:text="${totalAlternativasCorretas}">0</div>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="info-icon"><i class="bi bi-ui-checks"></i></div>
+                <div>
+                    <div class="info-label">Alternativas corridas</div>
+                    <div class="info-value" th:text="${totalAlternativas}">0</div>
+                </div>
+            </div>
         </div>
 
-        <div class="alert alert-info" th:if="${#lists.isEmpty(perguntas)}">
-            Nenhuma pergunta cadastrada para esta corrida.
-        </div>
+        <div class="perguntas-card">
+            <div class="perguntas-card-header">
+                <div>
+                    <h2>Perguntas</h2>
+                    <p>Gerencie as perguntas desta corrida.</p>
+                </div>
+                <a th:href="@{/corridas/{corridaId}/perguntas/novo(corridaId=${corrida.id})}" class="btn-new">
+                    <i class="bi bi-plus-lg"></i> Nova pergunta
+                </a>
+            </div>
 
-        <a th:href="@{/corridas/{id}(id=${corrida.id})}" class="btn btn-secondary">Voltar aos Detalhes</a>
+            <div th:if="${!#lists.isEmpty(perguntas)}">
+                <div class="pergunta-item" th:each="pergunta, stat : ${perguntas}">
+                    <div class="pergunta-index" th:text="${stat.index + 1}">1</div>
+
+                    <div class="pergunta-content">
+                        <span class="pergunta-label">Enunciado</span>
+                        <a class="pergunta-title"
+                           th:href="@{/corridas/{corridaId}/perguntas/{perguntaId}(corridaId=${corrida.id}, perguntaId=${pergunta.id})}"
+                           th:text="${pergunta.enunciado}">Pergunta</a>
+                    </div>
+
+                    <div class="pergunta-alternativas">
+                        <span class="pergunta-label">Alternativas (UUID)</span>
+                        <div class="alternativas-list"
+                             th:if="${pergunta.alternativas != null and pergunta.alternativas.size() > 0}">
+                            <span class="alternativa-pill"
+                                  th:each="alternativa, altStat : ${pergunta.alternativas}"
+                                  th:text="${#strings.substring('ABCDEFGHIJKLMNOPQRSTUVWXYZ', altStat.index, altStat.index + 1)} + ') ' + alternativa.id">A) 00000000</span>
+                        </div>
+                        <div class="alternativas-vazia"
+                             th:if="${pergunta.alternativas == null or pergunta.alternativas.size() == 0}">
+                            Nenhuma alternativa cadastrada.
+                        </div>
+                    </div>
+
+                    <div class="pergunta-actions">
+                        <span class="pergunta-label">Ações</span>
+                        <div class="action-buttons">
+                            <a class="btn-icon" title="Ver detalhes"
+                               th:href="@{/corridas/{corridaId}/perguntas/{perguntaId}(corridaId=${corrida.id}, perguntaId=${pergunta.id})}">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a class="btn-icon" title="Editar"
+                               th:href="@{/corridas/{corridaId}/perguntas/editar/{perguntaId}(corridaId=${corrida.id}, perguntaId=${pergunta.id})}">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a class="btn-icon" title="Alternativas"
+                               th:href="@{/corridas/{corridaId}/perguntas/{perguntaId}/alternativas(corridaId=${corrida.id}, perguntaId=${pergunta.id})}">
+                                <i class="bi bi-ui-checks-grid"></i>
+                            </a>
+                            <a class="btn-icon danger" title="Excluir"
+                               th:href="@{/corridas/{corridaId}/perguntas/apagar/{perguntaId}(corridaId=${corrida.id}, perguntaId=${pergunta.id})}"
+                               onclick="return confirm('Tem certeza que deseja excluir esta pergunta?')">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="empty-state" th:if="${#lists.isEmpty(perguntas)}">
+                <h2>Nenhuma pergunta cadastrada</h2>
+                <p>Clique em "Nova pergunta" para criar a primeira.</p>
+            </div>
+        </div>
     </main>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

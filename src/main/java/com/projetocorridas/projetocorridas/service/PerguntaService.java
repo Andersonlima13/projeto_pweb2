@@ -26,6 +26,7 @@ public class PerguntaService {
         pergunta.setCorridaId(dto.getCorridaId());
         pergunta.setEnunciado(dto.getEnunciado());
         pergunta.setRespostaCorreta(Math.toIntExact(dto.getRespostaCorreta()));
+        pergunta.setTempo(dto.getTempo());
         return pergunta;
     }
 
@@ -35,6 +36,7 @@ public class PerguntaService {
                 .corridaId(entity.getCorridaId())
                 .enunciado(entity.getEnunciado())
                 .respostaCorreta(entity.getRespostaCorreta())
+                .tempo(entity.getTempo())
                 .build();
     }
 
@@ -89,6 +91,7 @@ public class PerguntaService {
         validarPerguntaDto(perguntaDto);
         perguntaExistente.setEnunciado(perguntaDto.getEnunciado());
         perguntaExistente.setRespostaCorreta(Math.toIntExact(perguntaDto.getRespostaCorreta()));
+        perguntaExistente.setTempo(perguntaDto.getTempo());
         Pergunta atualizada = perguntaRepository.save(perguntaExistente);
         return entityToDto(atualizada);
     }

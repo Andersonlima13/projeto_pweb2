@@ -36,8 +36,17 @@ public class PerguntaController {
             CorridaDto corrida = corridaService.obter(corridaId);
             List<PerguntaDto> perguntas = perguntaService.listarPorCorrida(corridaId);
             perguntas.forEach(this::carregarAlternativas);
+            long totalAlternativas = perguntas.stream()
+                    .mapToLong(pergunta -> pergunta.getAlternativas() == null ? 0 : pergunta.getAlternativas().size())
+                    .sum();
+            long totalAlternativasCorretas = perguntas.stream()
+                    .mapToLong(PerguntaDto::getRespostaCorreta)
+                    .sum();
             mv.addObject("corrida", corrida);
             mv.addObject("perguntas", perguntas);
+            mv.addObject("totalPerguntas", perguntas.size());
+            mv.addObject("totalAlternativas", totalAlternativas);
+            mv.addObject("totalAlternativasCorretas", totalAlternativasCorretas);
         } catch (IllegalArgumentException e) {
             mv.setViewName("redirect:/corridas");
         }
