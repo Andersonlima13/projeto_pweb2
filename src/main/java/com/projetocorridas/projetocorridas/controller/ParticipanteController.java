@@ -18,7 +18,6 @@ public class ParticipanteController {
     @Autowired
     private ParticipanteService participanteService;
 
-    // Listar todos os participantes
     @GetMapping
     public ModelAndView listar() {
         ModelAndView mv = new ModelAndView("participantes/listar");
@@ -35,7 +34,6 @@ public class ParticipanteController {
         return mv;
     }
 
-    // Criar novo participante
     @PostMapping("/salvar")
     public String salvar(@ModelAttribute ParticipanteDto participanteDto) {
         if (participanteDto.getId() != null) {
@@ -46,7 +44,6 @@ public class ParticipanteController {
         return "redirect:/participantes";
     }
 
-    // Formulário para editar participante
     @GetMapping("/editar/{id}")
     public ModelAndView editar(@PathVariable UUID id) {
         ModelAndView mv = new ModelAndView("participantes/formulario");
