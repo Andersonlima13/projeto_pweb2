@@ -24,7 +24,6 @@ public class Corrida {
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(columnDefinition = "uuid", updatable = false, nullable = false)
     private UUID id;
-    private Integer tempo;
 
     @Transient
     private List<Pergunta> perguntas;

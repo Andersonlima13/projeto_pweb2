@@ -15,7 +15,6 @@ public class CorridaDto {
     private UUID id;
     private String titulo;
     private String descricao;
-    private Integer tempo;
     private java.util.List<PerguntaDto> perguntas;
 
 }

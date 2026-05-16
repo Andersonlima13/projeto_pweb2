@@ -24,7 +24,6 @@ public class CorridaService {
         corrida.setId(dto.getId());
         corrida.setTitulo(dto.getTitulo());
         corrida.setDescricao(dto.getDescricao());
-        corrida.setTempo(dto.getTempo());
         return corrida;
     }
 
@@ -33,7 +32,6 @@ public class CorridaService {
                 .id(entity.getId())
                 .titulo(entity.getTitulo())
                 .descricao(entity.getDescricao())
-                .tempo(entity.getTempo())
                 .perguntas(new ArrayList<>())
                 .build();
     }
@@ -72,7 +70,6 @@ public class CorridaService {
 
         corridaExistente.setTitulo(corridaDto.getTitulo());
         corridaExistente.setDescricao(corridaDto.getDescricao());
-        corridaExistente.setTempo(corridaDto.getTempo());
 
         Corrida atualizada = corridaRepository.save(corridaExistente);
         return entityToDto(atualizada);
@@ -86,9 +83,6 @@ public class CorridaService {
 
     private void validarCorridaDto(CorridaDto corridaDto) {
         verificaNomeDuplicado(corridaDto.getTitulo());
-        if (corridaDto.getTempo() == null) {
-            throw new IllegalArgumentException("Tempo é obrigatório");
-        }
         if (corridaDto.getTitulo() == null || corridaDto.getTitulo().trim().isEmpty()) {
             throw new IllegalArgumentException("Título é obrigatório");
         }

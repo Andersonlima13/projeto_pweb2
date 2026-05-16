@@ -1,13 +1,13 @@
 package com.projetocorridas.projetocorridas.controller;
 
+import com.projetocorridas.projetocorridas.dto.CorridaDto;
+import com.projetocorridas.projetocorridas.service.CorridaService;
+import com.projetocorridas.projetocorridas.service.PerguntaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-
-import com.projetocorridas.projetocorridas.dto.CorridaDto;
-import com.projetocorridas.projetocorridas.service.CorridaService;
-import com.projetocorridas.projetocorridas.service.PerguntaService;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,23 +27,29 @@ public class CorridaController {
         ModelAndView mv = new ModelAndView("corridas/listar");
         List<CorridaDto> corridas = corridaService.listarTodas();
         mv.addObject("corridas", corridas);
+        mv.addObject("corridaDto", new CorridaDto());
+        mv.addObject("openModal", false);
         return mv;
     }
 
     @GetMapping("/novo")
     public ModelAndView formularioCriar() {
-        ModelAndView mv = new ModelAndView("corridas/formulario");
+        ModelAndView mv = new ModelAndView("corridas/listar");
+        List<CorridaDto> corridas = corridaService.listarTodas();
+        mv.addObject("corridas", corridas);
         mv.addObject("corridaDto", new CorridaDto());
-        mv.addObject("acao", "Criar");
+        mv.addObject("openModal", true);
         return mv;
     }
 
     @PostMapping
-    public String criar(@ModelAttribute CorridaDto corridaDto) {
+    public String criar(@ModelAttribute CorridaDto corridaDto, RedirectAttributes redirectAttributes) {
         try {
             corridaService.criar(corridaDto);
+            redirectAttributes.addFlashAttribute("mensagem", "Corrida criada com sucesso.");
             return "redirect:/corridas";
         } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("erro", e.getMessage());
             return "redirect:/corridas/novo";
         }
     }

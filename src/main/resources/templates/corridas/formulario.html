@@ -52,13 +52,6 @@
                                           th:field="*{descricao}" placeholder="Digite a descrição da corrida" required></textarea>
                             </div>
 
-                            <!-- Tempo -->
-                            <div class="mb-3">
-                                <label for="tempo" class="form-label">Tempo (segundos)</label>
-                                <input type="number" class="form-control" id="tempo" 
-                                       th:field="*{tempo}" placeholder="Digite o tempo em segundos" required>
-                                <small class="form-text text-muted">Tempo em segundos para a corrida</small>
-                            </div>
 
                             <!-- Botões -->
                             <div class="d-flex gap-2">
@@ -73,9 +66,8 @@
                 <div class="alert alert-info mt-4">
                     <h6>Informações:</h6>
                     <ul class="mb-0">
-                        <li>Todos os campos são obrigatórios</li>
+                        <li>Título e descrição são obrigatórios</li>
                         <li>O título deve ser único no sistema</li>
-                        <li>O tempo deve ser informado em segundos</li>
                     </ul>
                 </div>
             </div>
@@ -88,11 +80,24 @@
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.querySelector('form');
             const corridaId = document.querySelector('input[name="id"]');
-            
+
             if (corridaId && corridaId.value) {
                 form.action = '[[@{/corridas/}]]' + corridaId.value;
                 form.method = 'POST';
             }
+
+            const titulo = document.getElementById('titulo');
+            const descricao = document.getElementById('descricao');
+
+            form.addEventListener('submit', function(e) {
+                if (titulo) titulo.value = titulo.value.trim();
+                if (descricao) descricao.value = descricao.value.trim();
+
+                if ((titulo && !titulo.value) || (descricao && !descricao.value)) {
+                    e.preventDefault();
+                    form.reportValidity();
+                }
+            });
         });
     </script>
 </body>

@@ -50,11 +50,6 @@
                             <p class="form-control-plaintext text-break" th:text="${corrida.descricao}"></p>
                         </div>
 
-                        <!-- Tempo -->
-                        <div class="mb-3">
-                            <label class="form-label"><strong>Tempo:</strong></label>
-                            <p class="form-control-plaintext" th:text="${corrida.tempo} + ' segundos'"></p>
-                        </div>
 
                         <!-- Perguntas -->
                         <div class="mb-3" th:if="${corrida.perguntas != null and corrida.perguntas.size() > 0}">
@@ -111,7 +106,6 @@
                     </div>
                     <div class="card-body">
                         <p><strong>Total de Perguntas:</strong> <span th:text="${corrida.perguntas != null ? corrida.perguntas.size() : 0}"></span></p>
-                        <p><strong>Duração da Corrida:</strong> <span th:text="${corrida.tempo}"></span> segundos</p>
                     </div>
                 </div>
             </div>
