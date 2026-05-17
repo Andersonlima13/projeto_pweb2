@@ -124,12 +124,12 @@
                     </div>
 
                     <div class="pergunta-alternativas">
-                        <span class="pergunta-label">Alternativas (UUID)</span>
+                        <span class="pergunta-label">Alternativas</span>
                         <div class="alternativas-list"
                              th:if="${pergunta.alternativas != null and pergunta.alternativas.size() > 0}">
                             <span class="alternativa-pill"
                                   th:each="alternativa, altStat : ${pergunta.alternativas}"
-                                  th:text="${#strings.substring('ABCDEFGHIJKLMNOPQRSTUVWXYZ', altStat.index, altStat.index + 1)} + ') ' + alternativa.id">A) 00000000</span>
+                                th:text="${alternativa.descricao}">Alternativa</span>
                         </div>
                         <div class="alternativas-vazia"
                              th:if="${pergunta.alternativas == null or pergunta.alternativas.size() == 0}">
@@ -148,10 +148,7 @@
                                th:href="@{/corridas/{corridaId}/perguntas/editar/{perguntaId}(corridaId=${corrida.id}, perguntaId=${pergunta.id})}">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <a class="btn-icon" title="Alternativas"
-                               th:href="@{/corridas/{corridaId}/perguntas/{perguntaId}/alternativas(corridaId=${corrida.id}, perguntaId=${pergunta.id})}">
-                                <i class="bi bi-ui-checks-grid"></i>
-                            </a>
+                       
                             <a class="btn-icon danger" title="Excluir"
                                th:href="@{/corridas/{corridaId}/perguntas/apagar/{perguntaId}(corridaId=${corrida.id}, perguntaId=${pergunta.id})}"
                                onclick="return confirm('Tem certeza que deseja excluir esta pergunta?')">
