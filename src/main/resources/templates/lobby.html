@@ -27,15 +27,37 @@
     </nav>
 
     <div class="main-content">
+        <div class="flash-stack">
+            <div class="flash-message flash-error" th:if="${erro}">
+                <i class="bi bi-shield-lock"></i>
+                <span th:text="${erro}"></span>
+            </div>
+            <div class="flash-message flash-info" th:if="${restricao}">
+                <i class="bi bi-info-circle"></i>
+                <span th:text="${restricao}"></span>
+            </div>
+        </div>
+
         <h1 class="welcome-text">
             Bem vindo <span th:if="${session.usuarioLogado != null}" th:text="${session.usuarioLogado.nome}">Usuário</span><span th:unless="${session.usuarioLogado != null}">!</span><span th:if="${session.usuarioLogado != null}">!</span>
         </h1>
-        
-        <div class="action-buttons">
+
+        <p class="welcome-subtitle" th:if="${session.usuarioLogado != null and !session.usuarioLogado.admin}">
+            Você está em modo participante. Apenas o lobby está disponível.
+        </p>
+
+        <div class="action-buttons" th:if="${session.usuarioLogado != null and session.usuarioLogado.admin}">
             <a th:href="@{/corridas}" class="btn-action">
                 <i class="bi bi-trophy"></i> Gerenciar corridas
             </a>
-      
+        </div>
+
+        <div class="lobby-note" th:if="${session.usuarioLogado != null and !session.usuarioLogado.admin}">
+            <div class="lobby-note-icon"><i class="bi bi-person"></i></div>
+            <div>
+                <h2>Acesso de participante</h2>
+                <p>As páginas de cadastro e edição ficam reservadas para administradores.</p>
+            </div>
         </div>
     </div>
 </body>
