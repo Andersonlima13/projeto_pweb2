@@ -2,38 +2,122 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Lista de Participantes</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Participantes - Projeto Corridas</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/participantes.css}">
 </head>
-<body class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Participantes</h2>
-        <a th:href="@{/participantes/novo}" class="btn btn-primary">Novo Participante</a>
-    </div>
+<body>
+    <nav class="navbar-custom">
+        <a th:href="@{/lobby}" class="navbar-brand-custom">
+            <i class="bi bi-code-slash"></i> Corridas de programação
+        </a>
+        <div class="d-flex align-items-center">
+            <a th:href="@{/auth/logout}" class="btn-logout">
+                <i class="bi bi-box-arrow-right"></i> Sair
+            </a>
+        </div>
+    </nav>
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Nome</th>
-                <th>ID</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="participante : ${participantes}">
-                <td th:text="${participante.nome}">Nome</td>
-                <td th:text="${participante.id}">ID</td>
-                <td>
-                    <a th:href="@{/participantes/editar/{id}(id=${participante.id})}" class="btn btn-sm btn-warning">Editar</a>
-                    <a th:href="@{/participantes/apagar/{id}(id=${participante.id})}" 
-                       class="btn btn-sm btn-danger" 
-                       onclick="return confirm('Tem certeza que deseja excluir?')">Excluir</a>
-                </td>
-            </tr>
-            <tr th:if="${#lists.isEmpty(participantes)}">
-                <td colspan="3" class="text-center">Nenhum participante cadastrado.</td>
-            </tr>
-        </tbody>
-    </table>
+    <main class="participantes-page">
+        <div class="message-stack">
+            <div class="message-box message-error" th:if="${erro}">
+                <span th:text="${erro}"></span>
+            </div>
+            <div class="message-box message-info" th:if="${mensagem}">
+                <span th:text="${mensagem}"></span>
+            </div>
+        </div>
+
+        <section class="dashboard-card">
+            <h2>Participantes</h2>
+            <p>Cadastro e manutenção de participantes visíveis apenas para administradores.</p>
+        </section>
+
+        <section class="stats-row" aria-label="Resumo do cadastro de participantes">
+            <div class="stat-card">
+                <p class="stat-label">Total de registros</p>
+                <p class="stat-value" th:text="${#lists.size(participantes)}">0</p>
+            </div>
+            <div class="stat-card">
+                <p class="stat-label">Perfil atual</p>
+                <p class="stat-value">Admin</p>
+            </div>
+            <div class="stat-card">
+                <p class="stat-label">Associação com corrida</p>
+                <p class="stat-value">Futuro</p>
+            </div>
+        </section>
+
+        <div class="layout-grid">
+            <section class="table-card">
+                <div class="table-card-header">
+                    <div>
+                        <h2>Lista de participantes</h2>
+                        <p>Edite, remova ou crie novos registros quando necessário.</p>
+                    </div>
+                    <a th:href="@{/participantes/novo}" class="btn-new">
+                        <i class="bi bi-plus-lg"></i> Novo participante
+                    </a>
+                </div>
+
+                <div class="table-responsive" th:if="${!#lists.isEmpty(participantes)}">
+                    <table class="table mb-0 participants-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>ID</th>
+                                <th>Tipo</th>
+                                <th>Corrida</th>
+                                <th class="text-end">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="participante : ${participantes}">
+                                <td>
+                                    <div class="participant-name" th:text="${participante.nome}">Nome</div>
+                                </td>
+                                <td class="participant-id" th:text="${participante.id}">ID</td>
+                                <td>
+                                    <span class="badge-role"
+                                          th:classappend="${participante.admin} ? ' badge-role-admin' : ' badge-role-user'"
+                                          th:text="${participante.admin} ? 'Administrador' : 'Participante'">Tipo</span>
+                                </td>
+                                <td>
+                                    <span class="badge-link badge-link-future">Vínculo futuro</span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="action-group justify-content-end">
+                                        <a th:href="@{/participantes/editar/{id}(id=${participante.id})}" class="btn-action-sm">Editar</a>
+                                        <a th:href="@{/participantes/apagar/{id}(id=${participante.id})}"
+                                           class="btn-action-danger-sm"
+                                           onclick="return confirm('Tem certeza que deseja excluir?')">Excluir</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="empty-state" th:if="${#lists.isEmpty(participantes)}">
+                    <h2>Nenhum participante cadastrado</h2>
+                    <p>Use o botão de novo participante para criar o primeiro registro.</p>
+                </div>
+            </section>
+
+            <aside class="association-card">
+                <h2>Vínculo com corrida</h2>
+                <p>O sistema ainda não persiste a relação entre participante e corrida.</p>
+                <div class="future-box">
+                    <strong>Estado atual</strong>
+                    <ul>
+                        <li>O cadastro de participantes funciona normalmente.</li>
+                        <li>A associação com corrida ficará para o próximo módulo.</li>
+                        <li>Esta tela já reserva espaço para essa informação.</li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+    </main>
 </body>
 </html>

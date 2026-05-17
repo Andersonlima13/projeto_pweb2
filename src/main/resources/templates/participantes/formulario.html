@@ -2,30 +2,90 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${participanteDto.id == null ? 'Novo Participante' : 'Editar Participante'}">Formulário</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${participanteDto.id == null ? 'Novo Participante' : 'Editar Participante'} + ' - Projeto Corridas'">Formulário</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/participantes.css}">
 </head>
-<body class="container mt-5">
-    <h2 th:text="${participanteDto.id == null ? 'Novo Participante' : 'Editar Participante'}">Formulário</h2>
-    <hr>
+<body>
+    <nav class="navbar-custom">
+        <a th:href="@{/lobby}" class="navbar-brand-custom">
+            <i class="bi bi-code-slash"></i> Corridas de programação
+        </a>
+        <div class="d-flex align-items-center">
+            <a th:href="@{/auth/logout}" class="btn-logout">
+                <i class="bi bi-box-arrow-right"></i> Sair
+            </a>
+        </div>
+    </nav>
 
-    <form th:action="@{/participantes/salvar}" th:object="${participanteDto}" method="POST" class="col-md-6">
-        <input type="hidden" th:field="*{id}">
-        
-        <div class="mb-3">
-            <label for="nome" class="form-label">Nome:</label>
-            <input type="text" th:field="*{nome}" class="form-control" id="nome" required>
+    <main class="participantes-page">
+        <div class="message-stack">
+            <div class="message-box message-error" th:if="${erro}">
+                <span th:text="${erro}"></span>
+            </div>
+            <div class="message-box message-info" th:if="${mensagem}">
+                <span th:text="${mensagem}"></span>
+            </div>
         </div>
 
-        <div class="mb-3">
-            <label for="senha" class="form-label">Senha:</label>
-            <input type="password" th:field="*{senha}" class="form-control" id="senha" required>
+        <div class="page-header">
+            <div class="header-title">
+                <h1 th:text="${participanteDto.id == null ? 'Novo participante' : 'Editar participante'}">Formulário</h1>
+                <p>Cadastro restrito a administradores.</p>
+            </div>
+            <a th:href="@{/participantes}" class="btn-new">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
         </div>
 
-        <div class="mt-4">
-            <button type="submit" class="btn btn-success">Salvar</button>
-            <a th:href="@{/participantes}" class="btn btn-secondary">Cancelar</a>
+        <div class="layout-grid">
+            <section class="form-card">
+                <div class="form-card-header">
+                    <h2>Dados do participante</h2>
+                    <p>Preencha os campos abaixo para salvar o registro.</p>
+                </div>
+
+                <form th:action="@{/participantes/salvar}" th:object="${participanteDto}" method="POST">
+                    <input type="hidden" th:field="*{id}">
+
+                    <div class="form-group">
+                        <label for="nome">Nome</label>
+                        <input type="text" th:field="*{nome}" class="form-input" id="nome" placeholder="Nome do participante" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="senha">Senha</label>
+                        <input type="password" th:field="*{senha}" class="form-input" id="senha" placeholder="Senha de acesso" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="corridaRelacionada">Corrida relacionada</label>
+                        <select class="form-select" id="corridaRelacionada" disabled>
+                            <option selected>Não implementado neste módulo</option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary-flat">Salvar</button>
+                        <a th:href="@{/participantes}" class="btn-secondary-flat">Cancelar</a>
+                    </div>
+                </form>
+            </section>
+
+            <aside class="association-card">
+                <h2>Associação futura</h2>
+                <p>O participante pode ser associado a uma corrida em uma etapa posterior do sistema.</p>
+                <div class="future-box">
+                    <strong>Observação</strong>
+                    <ul>
+                        <li>Não criamos o relacionamento entre participante e corrida agora.</li>
+                        <li>O campo acima existe apenas como referência visual.</li>
+                        <li>Quando o módulo existir, esta tela pode ser estendida sem ruptura do layout.</li>
+                    </ul>
+                </div>
+            </aside>
         </div>
-    </form>
+    </main>
 </body>
 </html>
