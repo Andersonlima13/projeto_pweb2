@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lobby do Participante - Projeto Corridas</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/lobby.css}">
+</head>
+<body>
+    <div class="bg-shape shape-circle"></div>
+    <div class="bg-shape shape-circle-2"></div>
+    <div class="bg-shape shape-triangle"></div>
+    <div class="bg-shape shape-square"></div>
+
+    <nav class="navbar-custom">
+        <div class="navbar-brand-custom">
+            <i class="bi bi-code-slash"></i> Corridas de programação
+        </div>
+        <div class="d-flex align-items-center">
+            <a th:href="@{/auth/logout}" class="btn-logout">
+                <i class="bi bi-box-arrow-right"></i> Sair
+            </a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="flash-stack">
+            <div class="flash-message flash-info">
+                <i class="bi bi-person"></i>
+                <span>Área exclusiva do participante.</span>
+            </div>
+        </div>
+
+        <h1 class="welcome-text">
+            Bem vindo <span th:text="${participante.nome}">Usuário</span>!
+        </h1>
+
+        <p class="welcome-subtitle">
+            Aqui você visualiza apenas sua corrida associada. As páginas de cadastro continuam restritas ao administrador.
+        </p>
+
+        <div class="lobby-note" th:if="${participante.corridaId != null}">
+            <div class="lobby-note-icon"><i class="bi bi-trophy"></i></div>
+            <div>
+                <h2>Corrida associada</h2>
+                <p th:text="${participante.corridaTitulo}">Nome da corrida</p>
+                <p class="mt-2">Você está vinculado a essa corrida no momento.</p>
+            </div>
+        </div>
+
+        <div class="lobby-note" th:if="${participante.corridaId == null}">
+            <div class="lobby-note-icon"><i class="bi bi-info-circle"></i></div>
+            <div>
+                <h2>Sem corrida vinculada</h2>
+                <p>Seu cadastro existe, mas ainda não foi associado a nenhuma corrida.</p>
+            </div>
+        </div>
+
+       
+    </div>
+</body>
+</html>

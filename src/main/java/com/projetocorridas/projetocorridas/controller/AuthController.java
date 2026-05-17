@@ -46,7 +46,7 @@ public class AuthController {
         Optional<UsuarioAutenticadoDto> usuario = authService.autenticarParticipante(dto);
         if (usuario.isPresent()) {
             adicionarCookieJwt(request, response, usuario.get());
-            return "redirect:/lobby";
+            return "redirect:/lobby/participante";
         }
         redirectAttributes.addFlashAttribute("erro", "Nome ou senha inválidos para participante");
         return "redirect:/auth/login";
@@ -60,7 +60,7 @@ public class AuthController {
         Optional<UsuarioAutenticadoDto> usuario = authService.autenticarAdministrador(dto);
         if (usuario.isPresent()) {
             adicionarCookieJwt(request, response, usuario.get());
-            return "redirect:/corridas";
+            return "redirect:/lobby";
         }
         redirectAttributes.addFlashAttribute("erro", "Email ou senha inválidos para administrador");
         return "redirect:/auth/login";
