@@ -6,88 +6,7 @@
     <title>Login - Projeto Corridas</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <style>
-        :root {
-            --bg-start: #0f172a;
-            --bg-end: #1e293b;
-            --accent: #f59e0b;
-        }
-
-        body {
-            min-height: 100vh;
-            background:
-                radial-gradient(circle at top left, rgba(245, 158, 11, 0.18), transparent 30%),
-                radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.18), transparent 35%),
-                linear-gradient(135deg, var(--bg-start), var(--bg-end));
-            color: #e2e8f0;
-        }
-
-        .hero-title {
-            letter-spacing: -0.04em;
-        }
-
-        .login-shell {
-            max-width: 1120px;
-            margin: 0 auto;
-            padding: 64px 16px;
-        }
-
-        .brand-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 0.9rem;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(10px);
-        }
-
-        .auth-card {
-            border: 0;
-            border-radius: 24px;
-            overflow: hidden;
-            background: rgba(15, 23, 42, 0.82);
-            backdrop-filter: blur(18px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
-            color: #e2e8f0;
-        }
-
-        .auth-card .card-header {
-            background: rgba(255, 255, 255, 0.04);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .auth-card .form-control {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            color: #f8fafc;
-        }
-
-        .auth-card .form-control:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 0.2rem rgba(245, 158, 11, 0.2);
-        }
-
-        .auth-card .form-label,
-        .muted-copy {
-            color: #cbd5e1;
-        }
-
-        .profile-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            padding: 0.35rem 0.7rem;
-            border-radius: 999px;
-            font-size: 0.85rem;
-            background: rgba(255, 255, 255, 0.06);
-            color: #cbd5e1;
-        }
-
-        .participant-accent { color: #38bdf8; }
-        .admin-accent { color: #f59e0b; }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
 </head>
 <body>
     <div class="login-shell">
@@ -120,7 +39,7 @@
                                 <small class="text-secondary">Acesso ao lobby e às corridas disponíveis.</small>
                             </div>
                             <div class="card-body p-4">
-                                <form th:action="@{/auth/login}" th:object="${participanteLoginDto}" method="post">
+                                <form th:action="@{/auth/login/participante}" th:object="${participanteLoginDto}" method="post">
                                     <div class="mb-3">
                                         <label for="participante-nome" class="form-label">Nome</label>
                                         <input type="text" th:field="*{nome}" class="form-control" id="participante-nome" placeholder="Seu nome" required>
@@ -144,7 +63,7 @@
                                 <small class="text-secondary">Acesso à gestão de corridas, perguntas e alternativas.</small>
                             </div>
                             <div class="card-body p-4">
-                                <form th:action="@{/auth/login/admin}" th:object="${administradorLoginDto}" method="post">
+                                <form th:action="@{/auth/corridas}" th:object="${administradorLoginDto}" method="post">
                                     <div class="mb-3">
                                         <label for="admin-email" class="form-label">Email</label>
                                         <input type="email" th:field="*{email}" class="form-control" id="admin-email" placeholder="admin@exemplo.com" required>

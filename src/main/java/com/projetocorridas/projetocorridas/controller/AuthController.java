@@ -38,7 +38,7 @@ public class AuthController {
         return "login";
     }
 
-    @PostMapping("/login")
+    @PostMapping("/login/participante")
     public String loginParticipante(@ModelAttribute("participanteLoginDto") ParticipanteLoginDto dto,
             HttpServletRequest request,
             HttpServletResponse response,
@@ -52,7 +52,7 @@ public class AuthController {
         return "redirect:/auth/login";
     }
 
-    @PostMapping("/login/admin")
+    @PostMapping("/corridas")
     public String loginAdministrador(@ModelAttribute("administradorLoginDto") AdministradorLoginDto dto,
             HttpServletRequest request,
             HttpServletResponse response,
