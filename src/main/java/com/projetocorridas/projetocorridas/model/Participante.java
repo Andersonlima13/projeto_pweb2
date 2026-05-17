@@ -15,10 +15,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Participante {
+public class Participante implements Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String nome;
     private String senha;
+    private boolean admin;
 }

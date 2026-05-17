@@ -23,6 +23,7 @@ public class ParticipanteService {
         Participante participante = new Participante();
         participante.setNome(participanteDto.getNome());
         participante.setSenha(participanteDto.getSenha());
+        participante.setAdmin(false);
 
         Participante salvo = participanteRepository.save(participante);
         return mapToDto(salvo);
@@ -50,6 +51,7 @@ public class ParticipanteService {
 
         existente.setNome(participanteDto.getNome());
         existente.setSenha(participanteDto.getSenha());
+        existente.setAdmin(false);
 
         Participante salvo = participanteRepository.save(existente);
         return mapToDto(salvo);
@@ -68,6 +70,7 @@ public class ParticipanteService {
                 .id(participante.getId())
                 .nome(participante.getNome())
                 .senha(participante.getSenha())
+                .admin(participante.isAdmin())
                 .build();
     }
 
