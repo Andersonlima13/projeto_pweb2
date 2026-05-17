@@ -7,7 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.projetocorridas.projetocorridas.dto.CorridaDto;
 import com.projetocorridas.projetocorridas.dto.PerguntaDto;
 import com.projetocorridas.projetocorridas.model.Corrida;
+import com.projetocorridas.projetocorridas.model.Participante;
 import com.projetocorridas.projetocorridas.repository.CorridaRepository;
+import com.projetocorridas.projetocorridas.repository.ParticipanteRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +24,9 @@ public class CorridaService {
 
     @Autowired
     private PerguntaService perguntaService;
+
+    @Autowired
+    private ParticipanteRepository participanteRepository;
 
     private Corrida dtoToEntity(CorridaDto dto) {
         Corrida corrida = new Corrida();
@@ -83,6 +88,12 @@ public class CorridaService {
     public void apagar(UUID id) {
         corridaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Corrida com ID " + id + " não encontrada"));
+
+        List<Participante> participantes = participanteRepository.findByCorrida_Id(id);
+        for (Participante participante : participantes) {
+            participante.setCorrida(null);
+        }
+        participanteRepository.saveAll(participantes);
 
         List<PerguntaDto> perguntas = perguntaService.listarPorCorrida(id);
         for (PerguntaDto pergunta : perguntas) {

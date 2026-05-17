@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.projetocorridas.projetocorridas.dto.ParticipanteDto;
+import com.projetocorridas.projetocorridas.model.Corrida;
 import com.projetocorridas.projetocorridas.model.Participante;
+import com.projetocorridas.projetocorridas.repository.CorridaRepository;
 import com.projetocorridas.projetocorridas.repository.ParticipanteRepository;
 
 import java.util.UUID;
@@ -17,6 +19,9 @@ public class ParticipanteService {
     @Autowired
     private ParticipanteRepository participanteRepository;
 
+    @Autowired
+    private CorridaRepository corridaRepository;
+
     // Criar novo participante
     public ParticipanteDto criar(ParticipanteDto participanteDto) {
         validarParticipanteDto(participanteDto);
@@ -24,6 +29,7 @@ public class ParticipanteService {
         participante.setNome(participanteDto.getNome());
         participante.setSenha(participanteDto.getSenha());
         participante.setAdmin(false);
+        participante.setCorrida(obterCorridaOpcional(participanteDto.getCorridaId()));
 
         Participante salvo = participanteRepository.save(participante);
         return mapToDto(salvo);
@@ -52,6 +58,7 @@ public class ParticipanteService {
         existente.setNome(participanteDto.getNome());
         existente.setSenha(participanteDto.getSenha());
         existente.setAdmin(false);
+        existente.setCorrida(obterCorridaOpcional(participanteDto.getCorridaId()));
 
         Participante salvo = participanteRepository.save(existente);
         return mapToDto(salvo);
@@ -71,7 +78,18 @@ public class ParticipanteService {
                 .nome(participante.getNome())
                 .senha(participante.getSenha())
                 .admin(participante.isAdmin())
+                .corridaId(participante.getCorrida() == null ? null : participante.getCorrida().getId())
+                .corridaTitulo(participante.getCorrida() == null ? null : participante.getCorrida().getTitulo())
                 .build();
+    }
+
+    private Corrida obterCorridaOpcional(UUID corridaId) {
+        if (corridaId == null) {
+            return null;
+        }
+
+        return corridaRepository.findById(corridaId)
+                .orElseThrow(() -> new IllegalArgumentException("Corrida com ID " + corridaId + " não encontrada"));
     }
 
     // Validar participante DTO

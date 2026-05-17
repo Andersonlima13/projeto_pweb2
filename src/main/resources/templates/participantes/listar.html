@@ -45,7 +45,7 @@
             </div>
             <div class="stat-card">
                 <p class="stat-label">Associação com corrida</p>
-                <p class="stat-value">Futuro</p>
+                <p class="stat-value">Opcional</p>
             </div>
         </section>
 
@@ -84,7 +84,9 @@
                                           th:text="${participante.admin} ? 'Administrador' : 'Participante'">Tipo</span>
                                 </td>
                                 <td>
-                                    <span class="badge-link badge-link-future">Vínculo futuro</span>
+                                    <span class="badge-link"
+                                          th:classappend="${participante.corridaId != null} ? ' badge-link-future' : ''"
+                                          th:text="${participante.corridaTitulo != null ? participante.corridaTitulo : 'Sem corrida'}">Sem corrida</span>
                                 </td>
                                 <td class="text-end">
                                     <div class="action-group justify-content-end">
@@ -112,8 +114,8 @@
                     <strong>Estado atual</strong>
                     <ul>
                         <li>O cadastro de participantes funciona normalmente.</li>
-                        <li>A associação com corrida ficará para o próximo módulo.</li>
-                        <li>Esta tela já reserva espaço para essa informação.</li>
+                        <li>A associação com corrida é opcional e já fica salva no registro.</li>
+                        <li>Quando não houver corrida, o participante permanece independente.</li>
                     </ul>
                 </div>
             </aside>

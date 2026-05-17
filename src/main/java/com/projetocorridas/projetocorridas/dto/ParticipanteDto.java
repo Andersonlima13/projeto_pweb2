@@ -16,5 +16,7 @@ public class ParticipanteDto {
     private String nome;
     private String senha;
     private Boolean admin;
+    private UUID corridaId;
+    private String corridaTitulo;
 
 }

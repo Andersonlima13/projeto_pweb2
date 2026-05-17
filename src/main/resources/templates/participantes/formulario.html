@@ -60,9 +60,13 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="corridaRelacionada">Corrida relacionada</label>
-                        <select class="form-select" id="corridaRelacionada" disabled>
-                            <option selected>Não implementado neste módulo</option>
+                        <label for="corridaId">Corrida relacionada</label>
+                        <select class="form-select" id="corridaId" th:field="*{corridaId}">
+                            <option value="">Sem corrida</option>
+                            <option th:each="corrida : ${corridas}"
+                                    th:value="${corrida.id}"
+                                    th:text="${corrida.titulo}">
+                            </option>
                         </select>
                     </div>
 
@@ -79,9 +83,9 @@
                 <div class="future-box">
                     <strong>Observação</strong>
                     <ul>
-                        <li>Não criamos o relacionamento entre participante e corrida agora.</li>
-                        <li>O campo acima existe apenas como referência visual.</li>
-                        <li>Quando o módulo existir, esta tela pode ser estendida sem ruptura do layout.</li>
+                        <li>O vínculo com corrida é opcional.</li>
+                        <li>Se houver corrida, o participante pode ser associado agora.</li>
+                        <li>Se não houver, o registro continua válido e independente.</li>
                     </ul>
                 </div>
             </aside>
