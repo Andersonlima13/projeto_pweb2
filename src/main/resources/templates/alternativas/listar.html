@@ -57,9 +57,9 @@
                     <tr th:each="alternativa : ${alternativas}">
                         <td th:text="${alternativa.descricao}">Alternativa</td>
                         <td>
-                            <span class="badge"
-                                  th:classappend="${alternativa.isCorreta} ? ' bg-success' : ' bg-secondary'"
-                                  th:text="${alternativa.isCorreta} ? 'Sim' : 'Não'">Status</span>
+                              <span class="badge"
+                                  th:classappend="${alternativa.correta} ? ' bg-success' : ' bg-secondary'"
+                                  th:text="${alternativa.correta} ? 'Sim' : 'Não'">Status</span>
                         </td>
                         <td>
                             <div class="d-flex flex-wrap gap-2">

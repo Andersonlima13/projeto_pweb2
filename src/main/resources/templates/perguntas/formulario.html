@@ -105,9 +105,9 @@
 
                             <div class="alternativa-footer">
                                 <label class="check-inline">
-                                    <input type="checkbox" class="correta-alternativa"
-                                           th:id="${'alternativaCorreta' + stat.index}"
-                                           th:field="*{alternativas[__${stat.index}__].isCorreta}">
+                                     <input type="checkbox" class="correta-alternativa"
+                                         th:id="${'alternativaCorreta' + stat.index}"
+                                         th:field="*{alternativas[__${stat.index}__].correta}">
                                     <span>Correta</span>
                                 </label>
                                 <button type="button" class="corrida-form-btn-secondary remover-alternativa">
@@ -218,7 +218,7 @@
                     <div class="alternativa-footer">
                         <label class="check-inline">
                             <input type="checkbox" class="correta-alternativa"
-                                   id="alternativaCorreta${indice}" name="alternativas[${indice}].isCorreta" value="true">
+                                id="alternativaCorreta${indice}" name="alternativas[${indice}].correta" value="true">
                             <span>Correta</span>
                         </label>
                         <button type="button" class="corrida-form-btn-secondary remover-alternativa">Remover</button>

@@ -88,8 +88,8 @@
                             <h3>Alternativa correta</h3>
                             <p>Marque esta opção se a resposta for correta.</p>
                         </div>
-                        <label class="check-inline check-inline-switch" for="isCorreta">
-                            <input type="checkbox" class="correta-alternativa" id="isCorreta" th:field="*{isCorreta}">
+                        <label class="check-inline check-inline-switch" for="correta">
+                            <input type="checkbox" class="correta-alternativa" id="correta" th:field="*{correta}">
                             <span>Correta</span>
                         </label>
                     </div>
@@ -99,7 +99,7 @@
                     <button type="submit" class="corrida-form-btn-primary">
                         <i class="bi bi-check2-circle"></i> Salvar alternativa
                     </button>
-                    <a th:href="@{/corridas/{corridaId}/perguntas/{perguntaId}/alternativas(corridaId=${corrida.id}, perguntaId=${pergunta.id})}"
+                    <a th:href="@{/corridas/{corridaId}/perguntas/{perguntaId}(corridaId=${corrida.id}, perguntaId=${pergunta.id})}"
                        class="corrida-form-btn-secondary">
                         Cancelar
                     </a>

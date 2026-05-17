@@ -12,7 +12,6 @@ import com.projetocorridas.projetocorridas.service.AlternativaService;
 import com.projetocorridas.projetocorridas.service.CorridaService;
 import com.projetocorridas.projetocorridas.service.PerguntaService;
 
-import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -28,23 +27,6 @@ public class AlternativaController {
     @Autowired
     private CorridaService corridaService;
 
-    @GetMapping
-    public ModelAndView listar(@PathVariable UUID corridaId,
-            @PathVariable UUID perguntaId) {
-        ModelAndView mv = new ModelAndView("alternativas/listar");
-        try {
-            CorridaDto corrida = corridaService.obter(corridaId);
-            PerguntaDto perguntaDto = perguntaService.obter(corridaId, perguntaId);
-            List<AlternativaDto> alternativas = alternativaService.listarPorPergunta(perguntaId);
-            mv.addObject("corrida", corrida);
-            mv.addObject("pergunta", perguntaDto);
-            mv.addObject("alternativas", alternativas);
-        } catch (IllegalArgumentException e) {
-            mv.setViewName("redirect:/corridas/" + corridaId + "/perguntas");
-        }
-        return mv;
-    }
-
     @GetMapping("/novo")
     public ModelAndView formularioCriar(@PathVariable UUID corridaId,
             @PathVariable UUID perguntaId) {
@@ -54,7 +36,7 @@ public class AlternativaController {
             PerguntaDto perguntaDto = perguntaService.obter(corridaId, perguntaId);
             AlternativaDto alternativaDto = new AlternativaDto();
             alternativaDto.setPerguntaId(perguntaId);
-            alternativaDto.setIsCorreta(false);
+            alternativaDto.setCorreta(false);
             mv.addObject("corrida", corrida);
             mv.addObject("pergunta", perguntaDto);
             mv.addObject("alternativaDto", alternativaDto);
@@ -80,7 +62,7 @@ public class AlternativaController {
 
             atualizarQuantidadeRespostasCorretas(corridaId, perguntaId);
             return "redirect:/corridas/" + corridaId + "/perguntas/"
-                    + perguntaId + "/alternativas";
+                    + perguntaId;
         } catch (IllegalArgumentException e) {
             if (alternativaDto.getId() != null) {
                 return "redirect:/corridas/" + corridaId + "/perguntas/"
@@ -88,13 +70,6 @@ public class AlternativaController {
             }
             return "redirect:/corridas/" + corridaId + "/perguntas/" + perguntaId + "/alternativas/novo";
         }
-    }
-
-    @PostMapping
-    public String criar(@PathVariable UUID corridaId,
-            @PathVariable UUID perguntaId,
-            @ModelAttribute AlternativaDto alternativaDto) {
-        return salvar(corridaId, perguntaId, alternativaDto);
     }
 
     @GetMapping({ "/editar/{alternativaId}", "/{alternativaId}/editar" })
@@ -141,7 +116,7 @@ public class AlternativaController {
             alternativaService.apagar(perguntaId, alternativaId);
             atualizarQuantidadeRespostasCorretas(corridaId, perguntaId);
             return "redirect:/corridas/" + corridaId + "/perguntas/"
-                    + perguntaId + "/alternativas";
+                    + perguntaId;
         } catch (IllegalArgumentException e) {
             return "redirect:/corridas/" + corridaId + "/perguntas/"
                     + perguntaId + "/alternativas";
@@ -151,7 +126,7 @@ public class AlternativaController {
     private void atualizarQuantidadeRespostasCorretas(UUID corridaId, UUID perguntaId) {
         PerguntaDto pergunta = perguntaService.obter(corridaId, perguntaId);
         long respostasCorretas = alternativaService.listarPorPergunta(perguntaId).stream()
-                .filter(alternativa -> Boolean.TRUE.equals(alternativa.getIsCorreta()))
+                .filter(alternativa -> Boolean.TRUE.equals(alternativa.getCorreta()))
                 .count();
         pergunta.setRespostaCorreta(respostasCorretas);
         perguntaService.alterar(pergunta);

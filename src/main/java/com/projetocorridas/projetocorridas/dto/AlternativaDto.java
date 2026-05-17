@@ -14,6 +14,6 @@ public class AlternativaDto {
     private UUID id;
     private UUID perguntaId;
     private String descricao;
-    private Boolean isCorreta;
+    private Boolean correta;
 
 }

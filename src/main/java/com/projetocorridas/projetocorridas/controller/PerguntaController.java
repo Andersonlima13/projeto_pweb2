@@ -225,7 +225,7 @@ public class PerguntaController {
                     .id(alternativa.getId())
                     .perguntaId(alternativa.getPerguntaId())
                     .descricao(alternativa.getDescricao().trim())
-                    .isCorreta(Boolean.TRUE.equals(alternativa.getIsCorreta()))
+                    .correta(Boolean.TRUE.equals(alternativa.getCorreta()))
                     .build());
         }
 
@@ -234,7 +234,7 @@ public class PerguntaController {
 
     private long contarAlternativasCorretas(List<AlternativaDto> alternativas) {
         return alternativas.stream()
-                .filter(alternativa -> Boolean.TRUE.equals(alternativa.getIsCorreta()))
+                .filter(alternativa -> Boolean.TRUE.equals(alternativa.getCorreta()))
                 .count();
     }
 

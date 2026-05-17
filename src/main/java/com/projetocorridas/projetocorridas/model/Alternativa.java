@@ -29,6 +29,6 @@ public class Alternativa {
     private Pergunta pergunta;
 
     private String descricao;
-    private Boolean isCorreta;
+    private Boolean correta;
 
 }

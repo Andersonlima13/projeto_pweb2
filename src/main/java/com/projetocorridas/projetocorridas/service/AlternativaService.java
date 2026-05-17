@@ -27,7 +27,7 @@ public class AlternativaService {
                 .id(entity.getId())
                 .perguntaId(entity.getPergunta().getId())
                 .descricao(entity.getDescricao())
-                .isCorreta(entity.getIsCorreta())
+                .correta(entity.getCorreta())
                 .build();
     }
 
@@ -79,7 +79,7 @@ public class AlternativaService {
         }
         validarAlternativaDto(alternativaDto);
         alternativa.setDescricao(alternativaDto.getDescricao().trim());
-        alternativa.setIsCorreta(Boolean.TRUE.equals(alternativaDto.getIsCorreta()));
+        alternativa.setCorreta(Boolean.TRUE.equals(alternativaDto.getCorreta()));
         Alternativa atualizada = alternativaRepository.save(alternativa);
         return entityToDto(atualizada);
     }
@@ -124,7 +124,7 @@ public class AlternativaService {
         Alternativa alternativa = new Alternativa();
         alternativa.setPergunta(pergunta);
         alternativa.setDescricao(alternativaDto.getDescricao().trim());
-        alternativa.setIsCorreta(Boolean.TRUE.equals(alternativaDto.getIsCorreta()));
+        alternativa.setCorreta(Boolean.TRUE.equals(alternativaDto.getCorreta()));
         return alternativa;
     }
 
