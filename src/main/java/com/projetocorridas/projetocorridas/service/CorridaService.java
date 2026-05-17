@@ -2,6 +2,7 @@ package com.projetocorridas.projetocorridas.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.projetocorridas.projetocorridas.dto.CorridaDto;
 import com.projetocorridas.projetocorridas.dto.PerguntaDto;
@@ -18,6 +19,9 @@ public class CorridaService {
 
     @Autowired
     private CorridaRepository corridaRepository;
+
+    @Autowired
+    private PerguntaService perguntaService;
 
     private Corrida dtoToEntity(CorridaDto dto) {
         Corrida corrida = new Corrida();
@@ -75,9 +79,16 @@ public class CorridaService {
         return entityToDto(atualizada);
     }
 
+    @Transactional
     public void apagar(UUID id) {
         corridaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Corrida com ID " + id + " não encontrada"));
+
+        List<PerguntaDto> perguntas = perguntaService.listarPorCorrida(id);
+        for (PerguntaDto pergunta : perguntas) {
+            perguntaService.apagar(id, pergunta.getId());
+        }
+
         corridaRepository.deleteById(id);
     }
 

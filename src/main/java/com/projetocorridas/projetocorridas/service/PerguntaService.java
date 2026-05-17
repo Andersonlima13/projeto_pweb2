@@ -2,9 +2,12 @@ package com.projetocorridas.projetocorridas.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.projetocorridas.projetocorridas.dto.PerguntaDto;
+import com.projetocorridas.projetocorridas.model.Alternativa;
 import com.projetocorridas.projetocorridas.model.Pergunta;
+import com.projetocorridas.projetocorridas.repository.AlternativaRepository;
 import com.projetocorridas.projetocorridas.repository.PerguntaRepository;
 import com.projetocorridas.projetocorridas.repository.CorridaRepository;
 
@@ -20,6 +23,9 @@ public class PerguntaService {
 
     @Autowired
     private CorridaRepository corridaRepository;
+
+    @Autowired
+    private AlternativaRepository alternativaRepository;
 
     private Pergunta dtoToEntity(PerguntaDto dto) {
         Pergunta pergunta = new Pergunta();
@@ -96,6 +102,7 @@ public class PerguntaService {
         return entityToDto(atualizada);
     }
 
+    @Transactional
     public void apagar(UUID corridaId, UUID perguntaId) {
         Pergunta pergunta = perguntaRepository.findById(perguntaId)
                 .orElseThrow(() -> new IllegalArgumentException("Pergunta com ID " + perguntaId + " não encontrada"));
@@ -103,6 +110,11 @@ public class PerguntaService {
         if (!pergunta.getCorridaId().equals(corridaId)) {
             throw new IllegalArgumentException(
                     "Pergunta com ID " + perguntaId + " não encontrada na corrida " + corridaId);
+        }
+
+        List<Alternativa> alternativas = alternativaRepository.findByPerguntaId(perguntaId);
+        if (!alternativas.isEmpty()) {
+            alternativaRepository.deleteAll(alternativas);
         }
 
         perguntaRepository.deleteById(perguntaId);
