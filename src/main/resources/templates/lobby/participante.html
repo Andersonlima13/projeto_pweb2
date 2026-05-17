@@ -37,27 +37,20 @@
         </h1>
 
         <p class="welcome-subtitle">
-            Aqui você visualiza apenas sua corrida associada. As páginas de cadastro continuam restritas ao administrador.
+            Aqui você encontra apenas a navegação inicial do participante. A lista de corridas vinculadas fica em uma tela separada.
         </p>
 
-        <div class="lobby-note" th:if="${participante.corridaId != null}">
-            <div class="lobby-note-icon"><i class="bi bi-trophy"></i></div>
-            <div>
-                <h2>Corrida associada</h2>
-                <p th:text="${participante.corridaTitulo}">Nome da corrida</p>
-                <p class="mt-2">Você está vinculado a essa corrida no momento.</p>
-            </div>
+     
+
+        <div class="action-buttons">
+            <a th:href="@{/lobby/participante/corridas}" class="btn-action">
+                <i class="bi bi-list-check"></i> Ver corridas
+            </a>
+            <a th:href="@{/auth/logout}" class="btn-action">
+                <i class="bi bi-box-arrow-right"></i> Sair
+            </a>
         </div>
 
-        <div class="lobby-note" th:if="${participante.corridaId == null}">
-            <div class="lobby-note-icon"><i class="bi bi-info-circle"></i></div>
-            <div>
-                <h2>Sem corrida vinculada</h2>
-                <p>Seu cadastro existe, mas ainda não foi associado a nenhuma corrida.</p>
-            </div>
-        </div>
-
-       
     </div>
 </body>
 </html>

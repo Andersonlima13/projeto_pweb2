@@ -64,6 +64,7 @@ public class AdminAccessInterceptor implements HandlerInterceptor {
     private boolean isLobbyPath(String requestPath) {
         return "/lobby".equals(requestPath)
                 || "/lobby/participante".equals(requestPath)
+                || "/lobby/participante/corridas".equals(requestPath)
                 || "/".equals(requestPath);
     }
 }
