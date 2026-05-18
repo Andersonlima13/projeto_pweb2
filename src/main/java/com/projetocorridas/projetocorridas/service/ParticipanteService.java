@@ -11,6 +11,7 @@ import com.projetocorridas.projetocorridas.repository.ParticipanteRepository;
 
 import java.util.UUID;
 import java.util.List;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,6 +47,16 @@ public class ParticipanteService {
     // Listar todos os participantes
     public List<ParticipanteDto> listarTodos() {
         return participanteRepository.findAll().stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<ParticipanteDto> listarRanking() {
+        return participanteRepository.findAll().stream()
+                .sorted(Comparator.comparingInt(
+                        (Participante participante) -> participante.getPontos() == null ? 0 : participante.getPontos())
+                        .reversed()
+                        .thenComparing(Participante::getNome, String.CASE_INSENSITIVE_ORDER))
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }

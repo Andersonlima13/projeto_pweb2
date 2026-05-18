@@ -63,6 +63,17 @@ public class LobbyController {
         return "lobby";
     }
 
+    @GetMapping("/lobby/participante/ranking")
+    public String ranking(HttpServletRequest request, Model model) {
+        if (obterUsuarioLogado(request) == null) {
+            return "redirect:/auth/login";
+        }
+
+        model.addAttribute("ranking", participanteService.listarRanking());
+        model.addAttribute("usuarioLogado", obterUsuarioLogado(request));
+        return "lobby/ranking";
+    }
+
     @GetMapping("/lobby/participante")
     public String lobbyParticipante(HttpServletRequest request, Model model) {
         Object sessionUsuario = request.getSession(false) == null ? null
@@ -193,5 +204,16 @@ public class LobbyController {
 
         UUID participanteId = UUID.fromString(autenticado.getId());
         return participanteService.obter(participanteId);
+    }
+
+    private UsuarioAutenticadoDto obterUsuarioLogado(HttpServletRequest request) {
+        Object sessionUsuario = request.getSession(false) == null ? null
+                : request.getSession(false).getAttribute("usuarioLogado");
+
+        if (sessionUsuario instanceof UsuarioAutenticadoDto autenticado) {
+            return autenticado;
+        }
+
+        return null;
     }
 }

@@ -53,6 +53,9 @@
             <a th:href="@{/participantes}" class="btn-action">
                 <i class="bi bi-people"></i> Gerenciar participantes
             </a>
+            <a th:href="@{/lobby/participante/ranking}" class="btn-action">
+                <i class="bi bi-award"></i> Ranking
+            </a>
         </div>
 
         <div class="lobby-note" th:if="${session.usuarioLogado != null and !session.usuarioLogado.admin}">

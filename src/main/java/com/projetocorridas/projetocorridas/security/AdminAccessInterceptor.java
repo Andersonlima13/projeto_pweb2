@@ -65,6 +65,7 @@ public class AdminAccessInterceptor implements HandlerInterceptor {
         return "/lobby".equals(requestPath)
                 || "/lobby/participante".equals(requestPath)
                 || "/lobby/participante/corridas".equals(requestPath)
+                || "/lobby/participante/ranking".equals(requestPath)
                 || requestPath.startsWith("/lobby/participante/corridas/")
                 || "/".equals(requestPath);
     }
