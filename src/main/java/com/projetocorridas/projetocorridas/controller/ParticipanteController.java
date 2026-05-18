@@ -5,7 +5,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.projetocorridas.projetocorridas.dto.CorridaDto;
 import com.projetocorridas.projetocorridas.dto.ParticipanteDto;
 import com.projetocorridas.projetocorridas.service.CorridaService;
 import com.projetocorridas.projetocorridas.service.ParticipanteService;
