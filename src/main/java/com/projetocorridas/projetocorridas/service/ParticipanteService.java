@@ -23,7 +23,6 @@ public class ParticipanteService {
     @Autowired
     private CorridaRepository corridaRepository;
 
-    // Criar novo participante
     public ParticipanteDto criar(ParticipanteDto participanteDto) {
         validarParticipanteDto(participanteDto);
         Participante participante = new Participante();
@@ -37,14 +36,12 @@ public class ParticipanteService {
         return mapToDto(salvo);
     }
 
-    // Obter participante por ID
     public ParticipanteDto obter(UUID id) {
         Participante participante = participanteRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Participante com ID " + id + " não encontrado"));
         return mapToDto(participante);
     }
 
-    // Listar todos os participantes
     public List<ParticipanteDto> listarTodos() {
         return participanteRepository.findAll().stream()
                 .map(this::mapToDto)
@@ -61,7 +58,6 @@ public class ParticipanteService {
                 .collect(Collectors.toList());
     }
 
-    // Alterar participante
     public ParticipanteDto alterar(ParticipanteDto participanteDto) {
         UUID id = participanteDto.getId();
         Participante existente = participanteRepository.findById(id)
@@ -89,7 +85,6 @@ public class ParticipanteService {
         return mapToDto(salvo);
     }
 
-    // Apagar participante
     public void apagar(UUID id) {
         if (!participanteRepository.existsById(id)) {
             throw new IllegalArgumentException("Participante com ID " + id + " não encontrado");
@@ -118,7 +113,6 @@ public class ParticipanteService {
                 .orElseThrow(() -> new IllegalArgumentException("Corrida com ID " + corridaId + " não encontrada"));
     }
 
-    // Validar participante DTO
     private void validarParticipanteDto(ParticipanteDto participanteDto) {
         if (participanteDto.getNome() == null || participanteDto.getNome().isBlank()) {
             throw new IllegalArgumentException("Nome é obrigatório");
