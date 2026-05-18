@@ -169,6 +169,7 @@ public class LobbyController {
         boolean acertou = Boolean.TRUE.equals(alternativaSelecionada.getCorreta());
 
         if (acertou) {
+            participanteService.incrementarPontos(participante.getId(), 20);
             redirectAttributes.addFlashAttribute("mensagem", "Resposta correta.");
         } else {
             redirectAttributes.addFlashAttribute("erro", "Resposta errada.");

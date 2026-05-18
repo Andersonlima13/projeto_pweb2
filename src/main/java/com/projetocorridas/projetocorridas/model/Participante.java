@@ -26,6 +26,7 @@ public class Participante implements Usuario {
     private String nome;
     private String senha;
     private boolean admin;
+    private Integer pontos;
 
     @ManyToOne(optional = true)
     @JoinColumn(name = "corrida_id", nullable = true)

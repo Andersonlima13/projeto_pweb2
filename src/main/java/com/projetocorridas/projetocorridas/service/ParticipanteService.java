@@ -29,6 +29,7 @@ public class ParticipanteService {
         participante.setNome(participanteDto.getNome());
         participante.setSenha(participanteDto.getSenha());
         participante.setAdmin(false);
+        participante.setPontos(participanteDto.getPontos() == null ? 0 : participanteDto.getPontos());
         participante.setCorrida(obterCorridaOpcional(participanteDto.getCorridaId()));
 
         Participante salvo = participanteRepository.save(participante);
@@ -58,9 +59,22 @@ public class ParticipanteService {
         existente.setNome(participanteDto.getNome());
         existente.setSenha(participanteDto.getSenha());
         existente.setAdmin(false);
+        existente.setPontos(participanteDto.getPontos() == null ? existente.getPontos() : participanteDto.getPontos());
         existente.setCorrida(obterCorridaOpcional(participanteDto.getCorridaId()));
 
         Participante salvo = participanteRepository.save(existente);
+        return mapToDto(salvo);
+    }
+
+    public ParticipanteDto incrementarPontos(UUID id, Integer pontos) {
+        Participante participante = participanteRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Participante com ID " + id + " não encontrado"));
+
+        int pontosAtuais = participante.getPontos() == null ? 0 : participante.getPontos();
+        int incremento = pontos == null ? 0 : pontos;
+        participante.setPontos(pontosAtuais + incremento);
+
+        Participante salvo = participanteRepository.save(participante);
         return mapToDto(salvo);
     }
 
@@ -78,6 +92,7 @@ public class ParticipanteService {
                 .nome(participante.getNome())
                 .senha(participante.getSenha())
                 .admin(participante.isAdmin())
+                .pontos(participante.getPontos())
                 .corridaId(participante.getCorrida() == null ? null : participante.getCorrida().getId())
                 .corridaTitulo(participante.getCorrida() == null ? null : participante.getCorrida().getTitulo())
                 .build();
