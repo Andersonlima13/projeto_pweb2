@@ -194,6 +194,7 @@ public class LobbyController {
         int proximoIndice = indice + 1;
         if (proximoIndice >= perguntas.size()) {
             corridaService.finalizar(corridaId);
+            redirectAttributes.addFlashAttribute("mensagem", "CORRIDA FINALIZADA");
             return "redirect:/lobby/participante/corridas";
         }
 
@@ -214,7 +215,7 @@ public class LobbyController {
         }
 
         corridaService.finalizar(corridaId);
-        redirectAttributes.addFlashAttribute("mensagem", "Corrida finalizada.");
+        redirectAttributes.addFlashAttribute("mensagem", "CORRIDA FINALIZADA");
         return "redirect:/lobby/participante/corridas";
     }
 

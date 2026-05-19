@@ -21,6 +21,11 @@
     </nav>
 
     <main class="participantes-page">
+        <div class="message-stack" th:if="${mensagem != null or erro != null}">
+            <div class="message-box message-info" th:if="${mensagem != null}" th:text="${mensagem}">Mensagem</div>
+            <div class="message-box message-error" th:if="${erro != null}" th:text="${erro}">Erro</div>
+        </div>
+
         <div class="message-stack">
             <div class="message-box message-info" th:if="${participante != null}">
                 <span th:text="'Corridas vinculadas a ' + ${participante.nome}"></span>
