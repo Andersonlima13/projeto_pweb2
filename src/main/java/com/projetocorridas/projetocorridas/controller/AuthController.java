@@ -67,7 +67,8 @@ public class AuthController {
     }
 
     @GetMapping("/logout")
-    public String logout(HttpServletRequest request, HttpServletResponse response) {
+    public String logout(HttpServletRequest request, HttpServletResponse response,
+            RedirectAttributes redirectAttributes) {
         if (request.getSession(false) != null) {
             request.getSession(false).invalidate();
         }
@@ -77,6 +78,7 @@ public class AuthController {
         cookie.setPath(request.getContextPath().isEmpty() ? "/" : request.getContextPath());
         cookie.setMaxAge(0);
         response.addCookie(cookie);
+        redirectAttributes.addFlashAttribute("mensagem", "Você saiu.");
         return "redirect:/auth/login";
     }
 

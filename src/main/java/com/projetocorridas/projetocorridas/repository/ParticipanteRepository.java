@@ -13,5 +13,7 @@ import org.springframework.stereotype.Repository;
 public interface ParticipanteRepository extends JpaRepository<Participante, UUID> {
     Optional<Participante> findByNomeAndSenha(String nome, String senha);
 
+    Optional<Participante> findByNome(String nome);
+
     List<Participante> findByCorrida_Id(UUID corridaId);
 }

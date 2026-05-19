@@ -13,7 +13,7 @@
             <i class="bi bi-code-slash"></i> Corridas de programação
         </a>
         <div class="d-flex align-items-center">
-            <a th:href="@{/auth/logout}" class="btn-logout">
+            <a th:href="@{/auth/logout}" class="btn-logout" onclick="return confirm('Deseja sair?')">
                 <i class="bi bi-box-arrow-right"></i> Sair
             </a>
         </div>

@@ -14,11 +14,17 @@
             <i class="bi bi-code-slash"></i> Corridas de programação
         </a>
         <div class="d-flex align-items-center">
-            <a th:href="@{/auth/logout}" class="btn-logout">
+            <a th:href="@{/auth/logout}" class="btn-logout" onclick="return confirm('Deseja sair?')">
                 <i class="bi bi-box-arrow-right"></i> Sair
             </a>
         </div>
     </nav>
+
+    <div class="breadcrumb-trail">
+        <a th:href="@{/lobby}">Lobby</a>
+        <i class="bi bi-chevron-right"></i>
+        <span>Corridas</span>
+    </div>
 
     <!-- Mensagens -->
     <div style="max-width: 1200px; margin: 1rem auto; padding: 0 1rem;">
@@ -29,6 +35,8 @@
             <span th:text="${erro}"></span>
         </div>
     </div>
+
+
 
     <!-- Header Section -->
     <div class="page-header">

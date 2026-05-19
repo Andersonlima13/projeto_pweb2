@@ -13,7 +13,7 @@
                 <span class="text-white me-3" th:if="${session.usuarioLogado != null}">
                     Bem-vindo, <span th:text="${session.usuarioLogado.nome}"></span>
                 </span>
-                <a th:href="@{/auth/logout}" class="btn btn-outline-light btn-sm">Sair</a>
+                <a th:href="@{/auth/logout}" class="btn btn-outline-light btn-sm" onclick="return confirm('Deseja sair?')">Sair</a>
             </div>
         </div>
     </nav>

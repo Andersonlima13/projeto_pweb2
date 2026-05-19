@@ -23,6 +23,33 @@ body {
 }
 
 /* Navbar */
+/* Additional styles omitted for brevity */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    --primary-color: #59b2c2;
+    --primary-dark: #378491;
+    --header-bg: #2d6b76;
+    --text-light: #ffffff;
+    --bg-light: #f4f7f8;
+    --text-dark: #333333;
+    --text-muted: #6c757d;
+    --card-bg: #ffffff;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    min-height: 100vh;
+}
+
+/* Navbar */
 .navbar-custom {
     background-color: var(--header-bg);
     padding: 1rem 2rem;
