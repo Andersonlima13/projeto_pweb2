@@ -92,9 +92,13 @@
                    th:if="${temAnterior}">
                     <i class="bi bi-arrow-left"></i> Anterior
                 </a>
-                <a th:href="@{/lobby/participante/corridas}" class="btn-secondary-flat" th:if="${!temAnterior}">
-                    <i class="bi bi-arrow-left"></i> Desistir
-                </a>
+                <form th:action="@{/lobby/participante/corridas/{corridaId}/desistir(corridaId=${corrida.id})}"
+                      method="post"
+                      th:if="${!temAnterior}">
+                    <button type="submit" class="btn-secondary-flat">
+                        <i class="bi bi-arrow-left"></i> Desistir
+                    </button>
+                </form>
 
             </div>
         </section>

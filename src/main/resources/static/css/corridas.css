@@ -157,6 +157,11 @@ body {
     color: white;
 }
 
+.badge-finalizada {
+    background-color: #6c757d;
+    color: white;
+}
+
 .badge-inativa {
     background-color: var(--danger-color);
     color: white;

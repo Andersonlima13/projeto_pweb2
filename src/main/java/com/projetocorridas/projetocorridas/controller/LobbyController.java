@@ -23,6 +23,7 @@ import com.projetocorridas.projetocorridas.service.AlternativaService;
 import com.projetocorridas.projetocorridas.service.PerguntaService;
 import com.projetocorridas.projetocorridas.service.CorridaService;
 import com.projetocorridas.projetocorridas.service.ParticipanteService;
+import com.projetocorridas.projetocorridas.model.EstadoCorrida;
 
 @Controller
 public class LobbyController {
@@ -125,6 +126,10 @@ public class LobbyController {
         }
 
         CorridaDto corrida = corridaService.obter(corridaId);
+        if (corrida.getEstadoCorrida() == EstadoCorrida.REALIZADA) {
+            return "redirect:/lobby/participante/corridas";
+        }
+
         List<PerguntaDto> perguntas = perguntaService.listarPorCorrida(corridaId);
 
         if (perguntas.isEmpty()) {
@@ -188,10 +193,29 @@ public class LobbyController {
 
         int proximoIndice = indice + 1;
         if (proximoIndice >= perguntas.size()) {
+            corridaService.finalizar(corridaId);
             return "redirect:/lobby/participante/corridas";
         }
 
         return "redirect:/lobby/participante/corridas/" + corridaId + "?indice=" + proximoIndice;
+    }
+
+    @PostMapping("/lobby/participante/corridas/{corridaId}/desistir")
+    public String desistirCorrida(HttpServletRequest request,
+            @PathVariable UUID corridaId,
+            RedirectAttributes redirectAttributes) {
+        ParticipanteDto participante = obterParticipanteLogado(request);
+        if (participante == null) {
+            return "redirect:/auth/login";
+        }
+
+        if (participante.getCorridaId() == null || !participante.getCorridaId().equals(corridaId)) {
+            return "redirect:/lobby/participante/corridas";
+        }
+
+        corridaService.finalizar(corridaId);
+        redirectAttributes.addFlashAttribute("mensagem", "Corrida finalizada.");
+        return "redirect:/lobby/participante/corridas";
     }
 
     private ParticipanteDto obterParticipanteLogado(HttpServletRequest request) {

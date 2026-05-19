@@ -36,7 +36,11 @@
             <article class="card-corrida" th:each="corrida : ${corridas}">
                 <div class="card-top">
                     <span class="card-id">ID: <span th:text="${#strings.substring(corrida.id.toString(), 0, 8)}"></span></span>
-                    <span class="badge-status badge-ativa">Associada</span>
+                    <span class="badge-status"
+                          th:classappend="${corrida.estadoCorrida != null and corrida.estadoCorrida.name() == 'REALIZADA'} ? ' badge-finalizada' : ' badge-ativa'"
+                          th:text="${corrida.estadoCorrida != null and corrida.estadoCorrida.name() == 'REALIZADA'} ? 'Finalizada' : 'Em andamento'">
+                        Em andamento
+                    </span>
                 </div>
                 <div class="card-body-custom">
                     <h3 th:text="${corrida.titulo}">Título da corrida</h3>
@@ -46,11 +50,16 @@
                     <span class="questions-count">
                         <i class="bi bi-person-check"></i> Participante vinculado
                     </span>
-                    <a th:href="@{/lobby/participante/corridas/{corridaId}(corridaId=${corrida.id})}"
+                    <a th:if="${corrida.estadoCorrida == null or corrida.estadoCorrida.name() != 'REALIZADA'}"
+                       th:href="@{/lobby/participante/corridas/{corridaId}(corridaId=${corrida.id})}"
                        class="btn-new"
                        style="padding: 0.55rem 0.95rem; font-size: 0.9rem;">
                         <i class="bi bi-play-fill"></i> Iniciar corrida
                     </a>
+                    <span th:if="${corrida.estadoCorrida != null and corrida.estadoCorrida.name() == 'REALIZADA'}"
+                          class="badge-status badge-finalizada">
+                        Finalizada
+                    </span>
                 </div>
             </article>
         </div>

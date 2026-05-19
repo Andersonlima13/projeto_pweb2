@@ -9,6 +9,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -40,6 +42,8 @@ public class Corrida {
 
     private String titulo;
     private String descricao;
+    @Enumerated(EnumType.STRING)
+    private EstadoCorrida estadoCorrida = EstadoCorrida.EM_ANDAMENTO;
     private boolean isativa;
 
 }

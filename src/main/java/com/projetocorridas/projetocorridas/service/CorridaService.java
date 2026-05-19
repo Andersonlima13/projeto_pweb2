@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.projetocorridas.projetocorridas.dto.CorridaDto;
 import com.projetocorridas.projetocorridas.dto.PerguntaDto;
+import com.projetocorridas.projetocorridas.model.EstadoCorrida;
 import com.projetocorridas.projetocorridas.model.Corrida;
 import com.projetocorridas.projetocorridas.model.Participante;
 import com.projetocorridas.projetocorridas.repository.CorridaRepository;
@@ -33,6 +34,7 @@ public class CorridaService {
         corrida.setId(dto.getId());
         corrida.setTitulo(dto.getTitulo());
         corrida.setDescricao(dto.getDescricao());
+        corrida.setEstadoCorrida(dto.getEstadoCorrida() == null ? EstadoCorrida.EM_ANDAMENTO : dto.getEstadoCorrida());
         return corrida;
     }
 
@@ -41,6 +43,8 @@ public class CorridaService {
                 .id(entity.getId())
                 .titulo(entity.getTitulo())
                 .descricao(entity.getDescricao())
+                .estadoCorrida(
+                        entity.getEstadoCorrida() == null ? EstadoCorrida.EM_ANDAMENTO : entity.getEstadoCorrida())
                 .perguntas(new ArrayList<>())
                 .build();
     }
@@ -50,6 +54,9 @@ public class CorridaService {
         corridaDto.setId(null);
         if (corridaDto.getPerguntas() == null) {
             corridaDto.setPerguntas(new ArrayList<>());
+        }
+        if (corridaDto.getEstadoCorrida() == null) {
+            corridaDto.setEstadoCorrida(EstadoCorrida.EM_ANDAMENTO);
         }
         Corrida corrida = dtoToEntity(corridaDto);
         Corrida salva = corridaRepository.save(corrida);
@@ -81,6 +88,16 @@ public class CorridaService {
         corridaExistente.setDescricao(corridaDto.getDescricao());
 
         Corrida atualizada = corridaRepository.save(corridaExistente);
+        return entityToDto(atualizada);
+    }
+
+    @Transactional
+    public CorridaDto finalizar(UUID id) {
+        Corrida corrida = corridaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Corrida com ID " + id + " não encontrada"));
+
+        corrida.setEstadoCorrida(EstadoCorrida.REALIZADA);
+        Corrida atualizada = corridaRepository.save(corrida);
         return entityToDto(atualizada);
     }
 
