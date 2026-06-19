@@ -68,14 +68,43 @@
 
 
                     <div class="form-group">
-                        <label for="corridaId">Corrida relacionada</label>
-                        <select class="form-select" id="corridaId" th:field="*{corridaId}">
-                            <option value="">Sem corrida</option>
-                            <option th:each="corrida : ${corridas}"
-                                    th:value="${corrida.id}"
-                                    th:text="${corrida.titulo}">
-                            </option>
-                        </select>
+                        <label>Corridas associadas</label>
+
+                        <div class="race-chip-list" id="corridasAssociadas">
+                            <div class="race-chip race-chip-associated"
+                                 th:each="corrida : ${corridasAssociadas}"
+                                 th:attr="data-corrida-id=${corrida.id},data-corrida-titulo=${corrida.titulo}">
+                                <input type="hidden" name="corridaIds" th:value="${corrida.id}">
+                                <span th:text="${corrida.titulo}">Corrida</span>
+                                <button type="button"
+                                        class="race-chip-action"
+                                        aria-label="Remover corrida associada">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="empty-inline" id="semCorridasAssociadas" th:hidden="${!#lists.isEmpty(corridasAssociadas)}">
+                            Nenhuma corrida associada.
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Corridas disponiveis</label>
+                        <div class="race-chip-list" id="corridasDisponiveis">
+                            <div class="race-chip race-chip-available"
+                                 th:each="corrida : ${corridasDisponiveis}"
+                                 th:attr="data-corrida-id=${corrida.id},data-corrida-titulo=${corrida.titulo}">
+                                <span th:text="${corrida.titulo}">Corrida</span>
+                                <button type="button"
+                                        class="race-chip-action"
+                                        aria-label="Adicionar corrida">
+                                    <i class="bi bi-plus-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="empty-inline" id="semCorridasDisponiveis" th:hidden="${!#lists.isEmpty(corridasDisponiveis)}">
+                            Todas as corridas existentes ja estao associadas a este participante.
+                        </div>
                     </div>
 
                     <div class="form-actions">
@@ -86,18 +115,75 @@
             </section>
 
             <aside class="association-card">
-                <h2>Associação futura</h2>
-                <p>O participante pode ser associado a uma corrida em uma etapa posterior do sistema.</p>
+                <h2>Associação com corridas</h2>
+                <p>O participante pode estar vinculado a uma ou mais corridas ao mesmo tempo.</p>
                 <div class="future-box">
                     <strong>Observação</strong>
                     <ul>
-                        <li>O vínculo com corrida é opcional.</li>
-                        <li>Se houver corrida, o participante pode ser associado agora.</li>
+                        <li>O vínculo com corridas é opcional.</li>
+                        <li>Use + para associar uma corrida disponivel.</li>
+                        <li>Use X para remover uma corrida associada.</li>
                         <li>Se não houver, o registro continua válido e independente.</li>
                     </ul>
                 </div>
             </aside>
         </div>
     </main>
+    <script>
+        const corridasAssociadas = document.getElementById('corridasAssociadas');
+        const corridasDisponiveis = document.getElementById('corridasDisponiveis');
+        const semCorridasAssociadas = document.getElementById('semCorridasAssociadas');
+        const semCorridasDisponiveis = document.getElementById('semCorridasDisponiveis');
+
+        function atualizarEstadosVazios() {
+            semCorridasAssociadas.hidden = corridasAssociadas.children.length > 0;
+            semCorridasDisponiveis.hidden = corridasDisponiveis.children.length > 0;
+        }
+
+        function associarCorrida(chip) {
+            chip.classList.remove('race-chip-available');
+            chip.classList.add('race-chip-associated');
+            chip.querySelector('.race-chip-action').setAttribute('aria-label', 'Remover corrida associada');
+            chip.querySelector('.race-chip-action i').className = 'bi bi-x-lg';
+
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'corridaIds';
+            input.value = chip.dataset.corridaId;
+            chip.prepend(input);
+
+            corridasAssociadas.appendChild(chip);
+            atualizarEstadosVazios();
+        }
+
+        function removerCorrida(chip) {
+            chip.classList.remove('race-chip-associated');
+            chip.classList.add('race-chip-available');
+            chip.querySelector('input[name="corridaIds"]')?.remove();
+            chip.querySelector('.race-chip-action').setAttribute('aria-label', 'Adicionar corrida');
+            chip.querySelector('.race-chip-action i').className = 'bi bi-plus-lg';
+
+            corridasDisponiveis.appendChild(chip);
+            atualizarEstadosVazios();
+        }
+
+        document.addEventListener('click', (event) => {
+            const button = event.target.closest('.race-chip-action');
+            if (!button) {
+                return;
+            }
+
+            const chip = button.closest('.race-chip');
+            if (chip.classList.contains('race-chip-available')) {
+                associarCorrida(chip);
+            } else {
+                removerCorrida(chip);
+            }
+        });
+
+        if (corridasAssociadas && corridasDisponiveis) {
+            atualizarEstadosVazios();
+        }
+    </script>
 </body>
 </html>

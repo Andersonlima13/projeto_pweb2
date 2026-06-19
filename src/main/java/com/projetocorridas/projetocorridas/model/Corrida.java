@@ -7,7 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
@@ -35,7 +35,7 @@ public class Corrida {
     @Transient
     private List<Pergunta> perguntas;
 
-    @OneToMany(mappedBy = "corrida", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "corridas", fetch = FetchType.LAZY)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Participante> participantes = new ArrayList<>();

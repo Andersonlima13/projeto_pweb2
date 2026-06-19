@@ -76,7 +76,7 @@
                                 <th>Nome</th>
                                 <th>ID</th>
                                 <th>Tipo</th>
-                                <th>Corrida</th>
+                                <th>Corridas</th>
                                 <th class="text-end">Ações</th>
                             </tr>
                         </thead>
@@ -93,8 +93,11 @@
                                 </td>
                                 <td>
                                     <span class="badge-link"
-                                          th:classappend="${participante.corridaId != null} ? ' badge-link-future' : ''"
-                                          th:text="${participante.corridaTitulo != null ? participante.corridaTitulo : 'Sem corrida'}">Sem corrida</span>
+                                          th:if="${#lists.isEmpty(participante.corridaTitulos)}">Sem corrida</span>
+                                    <span class="badge-link badge-link-future"
+                                          th:if="${!#lists.isEmpty(participante.corridaTitulos)}"
+                                          th:each="corridaTitulo : ${participante.corridaTitulos}"
+                                          th:text="${corridaTitulo}">Corrida</span>
                                 </td>
                                 <td class="text-end">
                                     <div class="action-group justify-content-end">
@@ -117,13 +120,13 @@
 
             <aside class="association-card">
                 <h2>Vínculo com corrida</h2>
-                <p>O sistema ainda não persiste a relação entre participante e corrida.</p>
+                <p>Um participante pode estar vinculado a várias corridas, e cada corrida pode conter vários participantes.</p>
                 <div class="future-box">
                     <strong>Estado atual</strong>
                     <ul>
                         <li>O cadastro de participantes funciona normalmente.</li>
-                        <li>A associação com corrida é opcional e já fica salva no registro.</li>
-                        <li>Quando não houver corrida, o participante permanece independente.</li>
+                        <li>A associação com corridas é opcional e fica salva no registro.</li>
+                        <li>Quando não houver corrida selecionada, o participante permanece independente.</li>
                     </ul>
                 </div>
             </aside>

@@ -125,7 +125,7 @@ public class ProjetocorridasApplication {
 					participante.setSenha(senha);
 					participante.setAdmin(false);
 					participante.setPontos(pontos);
-					participante.setCorrida(corrida);
+					participante.getCorridas().add(corrida);
 					return participanteRepository.save(participante);
 				});
 	}

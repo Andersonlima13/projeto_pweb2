@@ -15,5 +15,5 @@ public interface ParticipanteRepository extends JpaRepository<Participante, UUID
 
     Optional<Participante> findByNome(String nome);
 
-    List<Participante> findByCorrida_Id(UUID corridaId);
+    List<Participante> findByCorridas_Id(UUID corridaId);
 }

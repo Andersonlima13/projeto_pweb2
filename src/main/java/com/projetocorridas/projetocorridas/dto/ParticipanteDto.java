@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -17,7 +19,9 @@ public class ParticipanteDto {
     private String senha;
     private Boolean admin;
     private Integer pontos;
-    private UUID corridaId;
-    private String corridaTitulo;
+    @Builder.Default
+    private List<UUID> corridaIds = new ArrayList<>();
+    @Builder.Default
+    private List<String> corridaTitulos = new ArrayList<>();
 
 }

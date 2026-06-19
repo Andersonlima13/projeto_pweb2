@@ -10,6 +10,7 @@ import com.projetocorridas.projetocorridas.repository.CorridaRepository;
 import com.projetocorridas.projetocorridas.repository.ParticipanteRepository;
 
 import java.util.UUID;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Comparator;
 import java.util.stream.Collectors;
@@ -30,7 +31,7 @@ public class ParticipanteService {
         participante.setSenha(participanteDto.getSenha());
         participante.setAdmin(false);
         participante.setPontos(participanteDto.getPontos() == null ? 0 : participanteDto.getPontos());
-        participante.setCorrida(obterCorridaOpcional(participanteDto.getCorridaId()));
+        participante.setCorridas(obterCorridas(participanteDto.getCorridaIds()));
 
         Participante salvo = participanteRepository.save(participante);
         return mapToDto(salvo);
@@ -69,7 +70,7 @@ public class ParticipanteService {
         }
         existente.setAdmin(false);
         existente.setPontos(participanteDto.getPontos() == null ? existente.getPontos() : participanteDto.getPontos());
-        existente.setCorrida(obterCorridaOpcional(participanteDto.getCorridaId()));
+        existente.setCorridas(obterCorridas(participanteDto.getCorridaIds()));
 
         Participante salvo = participanteRepository.save(existente);
         return mapToDto(salvo);
@@ -101,18 +102,30 @@ public class ParticipanteService {
                 .senha(participante.getSenha())
                 .admin(participante.isAdmin())
                 .pontos(participante.getPontos())
-                .corridaId(participante.getCorrida() == null ? null : participante.getCorrida().getId())
-                .corridaTitulo(participante.getCorrida() == null ? null : participante.getCorrida().getTitulo())
+                .corridaIds(participante.getCorridas().stream()
+                        .map(Corrida::getId)
+                        .collect(Collectors.toList()))
+                .corridaTitulos(participante.getCorridas().stream()
+                        .map(Corrida::getTitulo)
+                        .collect(Collectors.toList()))
                 .build();
     }
 
-    private Corrida obterCorridaOpcional(UUID corridaId) {
-        if (corridaId == null) {
-            return null;
+    private List<Corrida> obterCorridas(List<UUID> corridaIds) {
+        if (corridaIds == null || corridaIds.isEmpty()) {
+            return new ArrayList<>();
         }
 
-        return corridaRepository.findById(corridaId)
-                .orElseThrow(() -> new IllegalArgumentException("Corrida com ID " + corridaId + " não encontrada"));
+        List<Corrida> corridas = new ArrayList<>();
+        for (UUID corridaId : corridaIds) {
+            if (corridaId == null) {
+                continue;
+            }
+            Corrida corrida = corridaRepository.findById(corridaId)
+                    .orElseThrow(() -> new IllegalArgumentException("Corrida com ID " + corridaId + " não encontrada"));
+            corridas.add(corrida);
+        }
+        return corridas;
     }
 
     private void validarParticipanteDto(ParticipanteDto participanteDto) {

@@ -106,9 +106,9 @@ public class CorridaService {
         corridaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Corrida com ID " + id + " não encontrada"));
 
-        List<Participante> participantes = participanteRepository.findByCorrida_Id(id);
+        List<Participante> participantes = participanteRepository.findByCorridas_Id(id);
         for (Participante participante : participantes) {
-            participante.setCorrida(null);
+            participante.getCorridas().removeIf(corrida -> corrida.getId().equals(id));
         }
         participanteRepository.saveAll(participantes);
 

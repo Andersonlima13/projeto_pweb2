@@ -102,8 +102,8 @@ public class LobbyController {
         }
 
         List<CorridaDto> corridas = new ArrayList<>();
-        if (participante.getCorridaId() != null) {
-            corridas.add(corridaService.obter(participante.getCorridaId()));
+        for (UUID corridaId : participante.getCorridaIds()) {
+            corridas.add(corridaService.obter(corridaId));
         }
 
         model.addAttribute("participante", participante);
@@ -121,7 +121,7 @@ public class LobbyController {
             return "redirect:/auth/login";
         }
 
-        if (participante.getCorridaId() == null || !participante.getCorridaId().equals(corridaId)) {
+        if (!participante.getCorridaIds().contains(corridaId)) {
             return "redirect:/lobby/participante/corridas";
         }
 
@@ -167,7 +167,7 @@ public class LobbyController {
             return "redirect:/auth/login";
         }
 
-        if (participante.getCorridaId() == null || !participante.getCorridaId().equals(corridaId)) {
+        if (!participante.getCorridaIds().contains(corridaId)) {
             return "redirect:/lobby/participante/corridas";
         }
 
@@ -210,7 +210,7 @@ public class LobbyController {
             return "redirect:/auth/login";
         }
 
-        if (participante.getCorridaId() == null || !participante.getCorridaId().equals(corridaId)) {
+        if (!participante.getCorridaIds().contains(corridaId)) {
             return "redirect:/lobby/participante/corridas";
         }
 
