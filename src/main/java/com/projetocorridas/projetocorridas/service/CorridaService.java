@@ -55,6 +55,7 @@ public class CorridaService {
                         entity.getEstadoCorrida() == null ? EstadoCorrida.EM_ANDAMENTO : entity.getEstadoCorrida())
                 .perguntas(new ArrayList<>())
                 .participantesIds(participantesIds)
+                .temFoto(entity.getFoto() != null && entity.getFoto().length > 0)
                 .build();
     }
 
@@ -191,6 +192,39 @@ public class CorridaService {
 
         corridaRepository.save(corrida);
         participanteRepository.save(participante);
+    }
+
+    public CorridaDto salvarFoto(UUID id, org.springframework.web.multipart.MultipartFile arquivo) {
+        Corrida corrida = corridaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Corrida com ID " + id + " não encontrada"));
+
+        try {
+            corrida.setFoto(arquivo.getBytes());
+            corrida.setFotoTipo(arquivo.getContentType());
+            Corrida atualizada = corridaRepository.save(corrida);
+            return entityToDto(atualizada);
+        } catch (java.io.IOException e) {
+            throw new IllegalArgumentException(
+                    "Não foi possível carregar a imagem: " + arquivo.getOriginalFilename() + ". Erro: "
+                            + e.getMessage());
+        }
+    }
+
+    public Corrida obterFotoEntity(UUID id) {
+        return corridaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Corrida com ID " + id + " não encontrada"));
+    }
+
+    @Transactional
+    public CorridaDto removerFoto(UUID id) {
+        Corrida corrida = corridaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Corrida com ID " + id + " não encontrada"));
+
+        corrida.setFoto(null);
+        corrida.setFotoTipo(null);
+
+        Corrida atualizada = corridaRepository.save(corrida);
+        return entityToDto(atualizada);
     }
 
 }

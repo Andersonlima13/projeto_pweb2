@@ -23,5 +23,7 @@ public class CorridaDto {
     private List<PerguntaDto> perguntas;
     private Set<UUID> participantesIds;
     private List<ParticipanteDto> participantes;
+    @Builder.Default
+    private boolean temFoto = false;
 
 }

@@ -19,13 +19,11 @@
             </a>
         </div>
     </nav>
-
     <div class="breadcrumb-trail">
         <a th:href="@{/lobby}">Lobby</a>
         <i class="bi bi-chevron-right"></i>
         <span>Corridas</span>
     </div>
-
     <!-- Mensagens -->
     <div style="max-width: 1200px; margin: 1rem auto; padding: 0 1rem;">
         <div style="background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;" th:if="${mensagem}">
@@ -35,9 +33,6 @@
             <span th:text="${erro}"></span>
         </div>
     </div>
-
-
-
     <!-- Header Section -->
     <div class="page-header">
         <div class="header-title">
@@ -48,32 +43,65 @@
             <i class="bi bi-plus-lg"></i> Nova corrida
         </a>
     </div>
-
     <!-- Grid de Corridas -->
     <div class="corridas-grid" th:if="${corridas.size() > 0}">
-        <a th:each="corrida : ${corridas}" th:href="@{/corridas/{id}/perguntas(id=${corrida.id})}" class="card-corrida">
-            <div class="card-top">
-                <span class="card-id">ID: <span th:text="${#strings.substring(corrida.id.toString(), 0, 8)}"></span></span>
-               
-            </div>
-            <div class="card-body-custom">
-                <h3 th:text="${corrida.titulo}">Título da Corrida</h3>
-                <p th:text="${corrida.descricao}">Descrição...</p>
-            </div>
-            <div class="card-footer-custom">
-                <span class="questions-count">
-                    <i class="bi bi-question-circle-fill"></i> 
-                </span>
-                <i class="bi bi-chevron-right arrow"></i>
-            </div>
-        </a>
-    </div>
+        <div th:each="corrida : ${corridas}" class="card-corrida-wrapper">
+            <a th:href="@{/corridas/{id}/perguntas(id=${corrida.id})}"
+               class="card-corrida"
+               th:style="${corrida.temFoto} ? 'background-image: url(' + @{/corridas/{id}/foto(id=${corrida.id})} + ');' : ''">
+                <div class="card-top">
+                    <span class="card-id">ID: <span th:text="${#strings.substring(corrida.id.toString(), 0, 8)}"></span></span>
+                </div>
+                <div class="card-body-custom">
+                    <h3 th:text="${corrida.titulo}">Título da Corrida</h3>
+                    <p th:text="${corrida.descricao}">Descrição...</p>
+                </div>
+                <div class="card-footer-custom">
+                    <span class="questions-count">
+                        <i class="bi bi-question-circle-fill"></i>
+                    </span>
+                    <i class="bi bi-chevron-right arrow"></i>
+                </div>
+            </a>
 
+            <!-- Ações de imagem, fora do <a> para não invalidar o HTML -->
+            <div class="foto-acoes">
+                <button type="button"
+                        class="btn-foto-corrida"
+                        title="Alterar imagem de fundo"
+                        th:attr="onclick='document.getElementById(\'foto-input-' + ${corrida.id} + '\').click()'">
+                    <i class="bi bi-image"></i>
+                </button>
+
+                <form th:if="${corrida.temFoto}"
+                      th:action="@{/corridas/{id}/foto/remover(id=${corrida.id})}"
+                      method="post"
+                      class="form-remover-foto">
+                    <button type="submit"
+                            class="btn-remover-foto"
+                            title="Remover imagem de fundo"
+                            onclick="return confirm('Remover a imagem de fundo desta corrida?')">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </form>
+            </div>
+
+            <form th:action="@{/corridas/{id}/foto(id=${corrida.id})}"
+                  method="post"
+                  enctype="multipart/form-data"
+                  style="display: none;">
+                <input type="file"
+                       name="foto"
+                       accept="image/*"
+                       th:id="'foto-input-' + ${corrida.id}"
+                       onchange="this.form.submit()">
+            </form>
+        </div>
+    </div>
     <!-- Empty State -->
     <div class="empty-state" th:if="${corridas.size() == 0}">
         <h2>Nenhuma corrida cadastrada</h2>
         <p>Clique no botão "Nova corrida" para criar sua primeira corrida.</p>
     </div>
-
 </body>
 </html>
