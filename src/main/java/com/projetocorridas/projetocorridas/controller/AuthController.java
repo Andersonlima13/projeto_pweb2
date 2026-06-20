@@ -74,18 +74,39 @@ public class AuthController {
         return "redirect:/auth/login";
     }
 
-    private boolean autenticar(String username, String senha,
-            HttpServletRequest request, HttpServletResponse response) {
+    private boolean autenticar(
+            String username,
+            String senha,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+
         try {
-            Authentication authRequest = new UsernamePasswordAuthenticationToken(username, senha);
+
+            Authentication authRequest = new UsernamePasswordAuthenticationToken(
+                    username,
+                    senha);
+
             Authentication authResult = authenticationManager.authenticate(authRequest);
 
-            SecurityContextHolder.getContext().setAuthentication(authResult);
-            securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
+            SecurityContextHolder
+                    .getContext()
+                    .setAuthentication(authResult);
+
+            securityContextRepository.saveContext(
+                    SecurityContextHolder.getContext(),
+                    request,
+                    response);
+
+            request.getSession()
+                    .setAttribute(
+                            "nomeUsuario",
+                            authResult.getName());
 
             return true;
+
         } catch (BadCredentialsException e) {
             return false;
         }
     }
+
 }
