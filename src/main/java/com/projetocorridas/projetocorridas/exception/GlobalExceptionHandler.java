@@ -3,23 +3,32 @@ package com.projetocorridas.projetocorridas.exception;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(Exception.class)
-    public String tratarErroGenerico(
-            Exception ex,
-            Model model) {
+        @ExceptionHandler(NoResourceFoundException.class)
+        public String tratar404(
+                        NoResourceFoundException ex,
+                        Model model) {
 
-        model.addAttribute(
-                "mensagemErro",
-                "Ocorreu um erro inesperado.");
+                model.addAttribute(
+                                "mensagemErro",
+                                "Página não encontrada.");
 
-        model.addAttribute(
-                "detalhesErro",
-                ex.getMessage());
+                return "error/404";
+        }
 
-        return "error/erro";
-    }
+        @ExceptionHandler(Exception.class)
+        public String tratarGenerico(
+                        Exception ex,
+                        Model model) {
+
+                model.addAttribute(
+                                "mensagemErro",
+                                "Erro interno.");
+
+                return "error/erro";
+        }
 }
