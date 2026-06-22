@@ -2,9 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${participanteDto.id == null ? 'Novo Participante' : 'Editar Participante'} + ' - Projeto Corridas'">Formulário</title>
+    <title th:text="${corridaDto.id == null ? 'Nova Corrida' : 'Editar Corrida'} + ' - Projeto Corridas'">Formulário de Corrida</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link rel="stylesheet" th:href="@{/css/participantes.css}">
+    <link rel="stylesheet" th:href="@{/css/corridas.css}">
 </head>
 <body>
     <nav class="navbar-custom">
@@ -17,38 +17,13 @@
             </a>
         </div>
     </nav>
-    <!-- Additional content omitted for brevity -->
-    </body>
-</html>
-
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Nova Corrida - Projeto Corridas</title>
-    <!-- Add Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" th:href="@{/css/corridas.css}">
-</head>
-<body>
-    <nav class="navbar-custom">
-        <a th:href="@{/lobby}" class="navbar-brand-custom">
-            <i class="bi bi-code-slash"></i> Corridas de programação
-        </a>
-        <div class="d-flex align-items-center">
-            <a th:href="@{/auth/logout}" class="btn-logout">
-                <i class="bi bi-box-arrow-right"></i> Sair
-            </a>
-        </div>
-    </nav>
 
     <div class="breadcrumb-trail">
         <a th:href="@{/lobby}">Lobby</a>
         <i class="bi bi-chevron-right"></i>
         <a th:href="@{/corridas}">Corridas</a>
         <i class="bi bi-chevron-right"></i>
-        <span>Nova corrida</span>
+        <span th:text="${corridaDto.id == null ? 'Nova corrida' : 'Editar corrida'}">Nova corrida</span>
     </div>
 
     <div class="corrida-form-page">
@@ -58,8 +33,8 @@
 
         <div class="page-header">
             <div class="header-title">
-                <h1>Criar nova corrida</h1>
-                <p>Preencha os dados abaixo para iniciar a corrida.</p>
+                <h1 th:text="${corridaDto.id == null ? 'Criar nova corrida' : 'Editar corrida'}">Criar nova corrida</h1>
+                <p>Preencha os dados abaixo para publicar a corrida.</p>
             </div>
         </div>
 
@@ -83,7 +58,7 @@
                 </div>
 
                 <div class="corrida-form-actions">
-                    <button type="submit" class="corrida-form-btn-primary">Criar Corrida</button>
+                    <button type="submit" class="corrida-form-btn-primary">Salvar Corrida</button>
                     <a th:href="@{/corridas}" class="corrida-form-btn-secondary">Cancelar</a>
                 </div>
             </form>
