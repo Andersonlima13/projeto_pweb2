@@ -28,8 +28,8 @@ public class AdminAccessInterceptor implements HandlerInterceptor {
         }
 
         FlashMap flashMap = RequestContextUtils.getOutputFlashMap(request);
-        flashMap.put("erro", "Acesso restrito a administradores.");
-        flashMap.put("restricao", "Somente administradores podem acessar páginas e operações de cadastro.");
+        flashMap.put("erro", "Acesso Apenas para administradores");
+        flashMap.put("restricao", "Apenas administradores podem acessar");
         flashMap.setTargetRequestPath(request.getContextPath() + "/lobby");
 
         RequestContextUtils.getFlashMapManager(request).saveOutputFlashMap(flashMap, request, response);
@@ -38,11 +38,6 @@ public class AdminAccessInterceptor implements HandlerInterceptor {
     }
 
     private UsuarioAutenticadoDto obterUsuarioLogado(HttpServletRequest request) {
-        Object usuario = request.getAttribute("usuarioLogado");
-        if (usuario instanceof UsuarioAutenticadoDto autenticado) {
-            return autenticado;
-        }
-
         Object sessionUsuario = request.getSession(false) == null ? null
                 : request.getSession(false).getAttribute("usuarioLogado");
         if (sessionUsuario instanceof UsuarioAutenticadoDto autenticado) {
