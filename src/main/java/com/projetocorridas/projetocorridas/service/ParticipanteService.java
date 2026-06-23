@@ -64,7 +64,9 @@ public class ParticipanteService {
                 .orElseThrow(() -> new IllegalArgumentException("Participante com ID " + id + " não encontrado"));
 
         existente.setNome(participanteDto.getNome());
-        existente.setSenha(participanteDto.getSenha());
+        if (participanteDto.getSenha() != null && !participanteDto.getSenha().isBlank()) {
+            existente.setSenha(participanteDto.getSenha());
+        }
         existente.setAdmin(false);
         existente.setPontos(participanteDto.getPontos() == null ? existente.getPontos() : participanteDto.getPontos());
         existente.setCorrida(obterCorridaOpcional(participanteDto.getCorridaId()));

@@ -53,6 +53,7 @@ public class ParticipanteController {
     public ModelAndView editar(@PathVariable UUID id) {
         ModelAndView mv = new ModelAndView("participantes/formulario");
         ParticipanteDto participante = participanteService.obter(id);
+        participante.setSenha(null);
         mv.addObject("participanteDto", participante);
         mv.addObject("corridas", corridaService.listarTodas());
         return mv;
