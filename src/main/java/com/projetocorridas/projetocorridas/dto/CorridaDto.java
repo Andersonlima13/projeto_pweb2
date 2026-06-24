@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.UUID;
+import java.util.Set;
+import java.util.List;
 
 import com.projetocorridas.projetocorridas.model.EstadoCorrida;
 
@@ -18,6 +20,8 @@ public class CorridaDto {
     private String titulo;
     private String descricao;
     private EstadoCorrida estadoCorrida;
-    private java.util.List<PerguntaDto> perguntas;
+    private List<PerguntaDto> perguntas;
+    private Set<UUID> participantesIds;
+    private List<ParticipanteDto> participantes;
 
 }
