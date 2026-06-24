@@ -13,6 +13,8 @@ import java.util.UUID;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -86,6 +88,29 @@ public class ParticipanteService {
 
         Participante salvo = participanteRepository.save(participante);
         return mapToDto(salvo);
+    }
+
+    public void atualizarParticipantesDaCorrida(UUID corridaId, List<UUID> participanteIds) {
+        Corrida corrida = corridaRepository.findById(corridaId)
+                .orElseThrow(() -> new IllegalArgumentException("Corrida com ID " + corridaId + " não encontrada"));
+        Set<UUID> idsAssociados = participanteIds == null ? new HashSet<>() : new HashSet<>(participanteIds);
+
+        List<Participante> participantes = participanteRepository.findAll();
+        for (Participante participante : participantes) {
+            boolean deveEstarAssociado = idsAssociados.contains(participante.getId());
+            boolean jaEstaAssociado = participante.getCorridas().stream()
+                    .anyMatch(corridaAtual -> corridaAtual.getId().equals(corridaId));
+
+            if (deveEstarAssociado && !jaEstaAssociado) {
+                participante.getCorridas().add(corrida);
+            }
+
+            if (!deveEstarAssociado && jaEstaAssociado) {
+                participante.getCorridas().removeIf(corridaAtual -> corridaAtual.getId().equals(corridaId));
+            }
+        }
+
+        participanteRepository.saveAll(participantes);
     }
 
     public void apagar(UUID id) {

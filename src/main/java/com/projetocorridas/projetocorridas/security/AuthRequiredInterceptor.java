@@ -1,36 +1,29 @@
 package com.projetocorridas.projetocorridas.security;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.FlashMap;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 import com.projetocorridas.projetocorridas.dto.UsuarioAutenticadoDto;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 @Component
-public class AdminAccessInterceptor implements HandlerInterceptor {
+public class AuthRequiredInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
 
         UsuarioAutenticadoDto usuario = obterUsuarioLogado(request);
-
-        if (usuario == null) {
-            negarAcesso(request, response, "Acesso restrito a usuários autenticados",
-                    "Faça login para continuar", request.getContextPath() + "/auth/login");
-            return false;
-        }
-
-        if (usuario.isAdmin()) {
+        if (usuario != null) {
             return true;
         }
 
-        negarAcesso(request, response, "Acesso apenas para administradores",
-                "Apenas administradores podem acessar", request.getContextPath() + "/lobby/participante");
+        negarAcesso(request, response, "Acesso restrito a usuários autenticados",
+                "Faça login para continuar");
         return false;
     }
 
@@ -44,13 +37,13 @@ public class AdminAccessInterceptor implements HandlerInterceptor {
     }
 
     private void negarAcesso(HttpServletRequest request, HttpServletResponse response,
-            String erro, String restricao, String destino) throws Exception {
+            String erro, String restricao) throws Exception {
         FlashMap flashMap = new FlashMap();
         flashMap.put("erro", erro);
         flashMap.put("restricao", restricao);
-        flashMap.setTargetRequestPath(destino);
+        flashMap.setTargetRequestPath(request.getContextPath() + "/auth/login");
 
         RequestContextUtils.getFlashMapManager(request).saveOutputFlashMap(flashMap, request, response);
-        response.sendRedirect(destino);
+        response.sendRedirect(request.getContextPath() + "/auth/login");
     }
 }
