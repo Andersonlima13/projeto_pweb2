@@ -1,0 +1,159 @@
+<div xmlns:th="http://www.thymeleaf.org">
+    <div th:if="${!#lists.isEmpty(participantesDisponiveis)}">
+        <p>Selecione um participante para adicionar à corrida:</p>
+        
+        <div class="participants-list">
+            <div class="participant-item" th:each="participante : ${participantesDisponiveis}">
+                <div class="participant-info">
+                    <span class="participant-name" th:text="${participante.nome}">Nome</span>
+                    <span class="participant-id" th:text="'ID: ' + ${#strings.substring(participante.id.toString(), 0, 8)}">ID</span>
+                </div>
+                <form th:action="@{/corridas/{corridaId}/perguntas/participantes/adicionar(corridaId=${corrida.id})}"
+                      method="POST"
+                      style="display: inline;">
+                    <input type="hidden" name="participanteId" th:value="${participante.id}">
+                    <button type="submit" class="btn-add-participant">
+                        <i class="bi bi-plus-circle"></i> Adicionar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(participantesDisponiveis)}" class="no-participants">
+        <p>Todos os participantes já estão associados a esta corrida.</p>
+    </div>
+
+    <div th:if="${!#lists.isEmpty(participantesAssociados)}">
+        <h3>Participantes já na corrida:</h3>
+        <div class="participants-associated">
+            <div class="participant-item-associated" th:each="participante : ${participantesAssociados}">
+                <div class="participant-info">
+                    <span class="participant-name" th:text="${participante.nome}">Nome</span>
+                    <span class="participant-id" th:text="'ID: ' + ${#strings.substring(participante.id.toString(), 0, 8)}">ID</span>
+                </div>
+                <form th:action="@{/corridas/{corridaId}/perguntas/participantes/remover(corridaId=${corrida.id})}"
+                      method="POST"
+                      style="display: inline;">
+                    <input type="hidden" name="participanteId" th:value="${participante.id}">
+                    <button type="submit" class="btn-remove-participant">
+                        <i class="bi bi-x-circle"></i> Remover
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .participants-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .participant-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s ease;
+        }
+
+        .participant-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .participant-item:last-child {
+            border-bottom: none;
+        }
+
+        .participant-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .participant-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .participant-id {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .btn-add-participant,
+        .btn-remove-participant {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add-participant {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-add-participant:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-remove-participant {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-remove-participant:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .participants-associated {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f5f5f5;
+        }
+
+        .participant-item-associated {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .participant-item-associated:last-child {
+            border-bottom: none;
+        }
+
+        .no-participants {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        h3 {
+            margin: 20px 0 10px 0;
+            color: #333;
+            font-size: 16px;
+        }
+    </style>
+</div>

@@ -13,8 +13,10 @@ import com.projetocorridas.projetocorridas.repository.CorridaRepository;
 import com.projetocorridas.projetocorridas.repository.ParticipanteRepository;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,6 +41,12 @@ public class CorridaService {
     }
 
     private CorridaDto entityToDto(Corrida entity) {
+        Set<UUID> participantesIds = entity.getParticipantes() != null
+                ? entity.getParticipantes().stream()
+                        .map(Participante::getId)
+                        .collect(Collectors.toSet())
+                : new HashSet<>();
+
         return CorridaDto.builder()
                 .id(entity.getId())
                 .titulo(entity.getTitulo())
@@ -46,6 +54,7 @@ public class CorridaService {
                 .estadoCorrida(
                         entity.getEstadoCorrida() == null ? EstadoCorrida.EM_ANDAMENTO : entity.getEstadoCorrida())
                 .perguntas(new ArrayList<>())
+                .participantesIds(participantesIds)
                 .build();
     }
 
@@ -145,6 +154,43 @@ public class CorridaService {
         corridaRepository.findById(corridaId)
                 .orElseThrow(() -> new IllegalArgumentException("Corrida com ID " + corridaId + " não encontrada"));
 
+    }
+
+    @Transactional
+    public void adicionarParticipante(UUID corridaId, UUID participanteId) {
+        Corrida corrida = corridaRepository.findById(corridaId)
+                .orElseThrow(() -> new IllegalArgumentException("Corrida com ID " + corridaId + " não encontrada"));
+
+        Participante participante = participanteRepository.findById(participanteId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Participante com ID " + participanteId + " não encontrado"));
+
+        // Verificar se já está associado
+        if (corrida.getParticipantes().stream().anyMatch(p -> p.getId().equals(participanteId))) {
+            throw new IllegalArgumentException("Participante já está associado a esta corrida");
+        }
+
+        corrida.getParticipantes().add(participante);
+        participante.getCorridas().add(corrida);
+
+        corridaRepository.save(corrida);
+        participanteRepository.save(participante);
+    }
+
+    @Transactional
+    public void removerParticipante(UUID corridaId, UUID participanteId) {
+        Corrida corrida = corridaRepository.findById(corridaId)
+                .orElseThrow(() -> new IllegalArgumentException("Corrida com ID " + corridaId + " não encontrada"));
+
+        Participante participante = participanteRepository.findById(participanteId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Participante com ID " + participanteId + " não encontrado"));
+
+        corrida.getParticipantes().removeIf(p -> p.getId().equals(participanteId));
+        participante.getCorridas().removeIf(c -> c.getId().equals(corridaId));
+
+        corridaRepository.save(corrida);
+        participanteRepository.save(participante);
     }
 
 }

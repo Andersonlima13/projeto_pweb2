@@ -9,13 +9,17 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.projetocorridas.projetocorridas.dto.AlternativaDto;
 import com.projetocorridas.projetocorridas.dto.PerguntaDto;
 import com.projetocorridas.projetocorridas.dto.CorridaDto;
+import com.projetocorridas.projetocorridas.dto.ParticipanteDto;
 import com.projetocorridas.projetocorridas.service.AlternativaService;
 import com.projetocorridas.projetocorridas.service.CorridaService;
 import com.projetocorridas.projetocorridas.service.PerguntaService;
+import com.projetocorridas.projetocorridas.service.ParticipanteService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/corridas/{corridaId}/perguntas")
@@ -29,6 +33,9 @@ public class PerguntaController {
 
     @Autowired
     private AlternativaService alternativaService;
+
+    @Autowired
+    private ParticipanteService participanteService;
 
     @GetMapping
     public ModelAndView listar(@PathVariable UUID corridaId) {
@@ -192,6 +199,64 @@ public class PerguntaController {
         } catch (IllegalArgumentException e) {
             return "redirect:/corridas/" + corridaId + "/perguntas/" + perguntaId;
         }
+    }
+
+    @GetMapping("/adicionar-participantes")
+    public ModelAndView adicionarParticipantesModal(@PathVariable UUID corridaId) {
+        ModelAndView mv = new ModelAndView("perguntas/adicionar-participantes");
+        try {
+            CorridaDto corrida = corridaService.obter(corridaId);
+            List<ParticipanteDto> todosParticipantes = participanteService.listarTodos();
+
+            // Obter IDs dos participantes já associados à corrida
+            Set<UUID> idsAssociados = corrida.getParticipantesIds() != null
+                    ? corrida.getParticipantesIds()
+                    : Set.of();
+
+            // Filtrar participantes não associados
+            List<ParticipanteDto> participantesDisponiveis = todosParticipantes.stream()
+                    .filter(p -> !idsAssociados.contains(p.getId()))
+                    .collect(Collectors.toList());
+
+            // Obter participantes já associados
+            List<ParticipanteDto> participantesAssociados = todosParticipantes.stream()
+                    .filter(p -> idsAssociados.contains(p.getId()))
+                    .collect(Collectors.toList());
+
+            mv.addObject("corrida", corrida);
+            mv.addObject("participantesDisponiveis", participantesDisponiveis);
+            mv.addObject("participantesAssociados", participantesAssociados);
+        } catch (IllegalArgumentException e) {
+            mv.setViewName("error");
+            mv.addObject("mensagem", e.getMessage());
+        }
+        return mv;
+    }
+
+    @PostMapping("/participantes/adicionar")
+    public String adicionarParticipante(@PathVariable UUID corridaId,
+            @RequestParam UUID participanteId,
+            RedirectAttributes redirectAttributes) {
+        try {
+            corridaService.adicionarParticipante(corridaId, participanteId);
+            redirectAttributes.addFlashAttribute("mensagem", "Participante adicionado com sucesso.");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("erro", e.getMessage());
+        }
+        return "redirect:/corridas/" + corridaId + "/perguntas";
+    }
+
+    @PostMapping("/participantes/remover")
+    public String removerParticipante(@PathVariable UUID corridaId,
+            @RequestParam UUID participanteId,
+            RedirectAttributes redirectAttributes) {
+        try {
+            corridaService.removerParticipante(corridaId, participanteId);
+            redirectAttributes.addFlashAttribute("mensagem", "Participante removido com sucesso.");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("erro", e.getMessage());
+        }
+        return "redirect:/corridas/" + corridaId + "/perguntas";
     }
 
     private void carregarAlternativas(PerguntaDto pergunta) {
