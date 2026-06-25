@@ -1,6 +1,5 @@
 package com.projetocorridas.projetocorridas.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -60,7 +59,13 @@ public class LobbyController {
     }
 
     @GetMapping("/lobby")
-    public String lobby() {
+    public String lobby(Model model) {
+        AppUserDetails usuario = obterUsuarioLogado();
+        if (usuario == null) {
+            return "redirect:/auth/login";
+        }
+        model.addAttribute("usuarioLogado", usuario);
+        model.addAttribute("isAdmin", ehAdmin(usuario));
         return "lobby";
     }
 
@@ -109,10 +114,7 @@ public class LobbyController {
         if (participante == null) {
             return "redirect:/auth/login";
         }
-        List<CorridaDto> corridas = new ArrayList<>();
-        for (UUID corridaId : participante.getCorridaIds()) {
-            corridas.add(corridaService.obter(corridaId));
-        }
+        List<CorridaDto> corridas = corridaService.listarTodas();
         model.addAttribute("participante", participante);
         model.addAttribute("corridas", corridas);
         return "lobby/participante-corridas";
@@ -125,9 +127,6 @@ public class LobbyController {
         ParticipanteDto participante = obterParticipanteLogado();
         if (participante == null) {
             return "redirect:/auth/login";
-        }
-        if (!participante.getCorridaIds().contains(corridaId)) {
-            return "redirect:/lobby/participante/corridas";
         }
         CorridaDto corrida = corridaService.obter(corridaId);
         if (corrida.getEstadoCorrida() == EstadoCorrida.REALIZADA) {
@@ -156,41 +155,74 @@ public class LobbyController {
     }
 
     @PostMapping("/lobby/participante/corridas/{corridaId}")
-    public String responderPergunta(@PathVariable UUID corridaId,
+    public String responderPergunta(
+            @PathVariable UUID corridaId,
             @RequestParam UUID perguntaId,
             @RequestParam UUID alternativaId,
             @RequestParam(name = "indice", defaultValue = "0") int indice,
             RedirectAttributes redirectAttributes) {
+
         ParticipanteDto participante = obterParticipanteLogado();
+
         if (participante == null) {
             return "redirect:/auth/login";
         }
-        if (!participante.getCorridaIds().contains(corridaId)) {
-            return "redirect:/lobby/participante/corridas";
-        }
+
         List<PerguntaDto> perguntas = perguntaService.listarPorCorrida(corridaId);
+
         if (perguntas.isEmpty() || indice < 0 || indice >= perguntas.size()) {
             return "redirect:/lobby/participante/corridas";
         }
+
         PerguntaDto perguntaAtual = perguntas.get(indice);
+
         if (!perguntaAtual.getId().equals(perguntaId)) {
             return "redirect:/lobby/participante/corridas/" + corridaId + "?indice=" + indice;
         }
+
         AlternativaDto alternativaSelecionada = alternativaService.obter(perguntaId, alternativaId);
+
         boolean acertou = Boolean.TRUE.equals(alternativaSelecionada.getCorreta());
+
         if (acertou) {
-            participanteService.incrementarPontos(participante.getId(), 20);
-            redirectAttributes.addFlashAttribute("mensagem", "Resposta correta.");
-        } else {
-            redirectAttributes.addFlashAttribute("erro", "Resposta errada.");
+            participanteService.incrementarPontos(
+                    participante.getId(),
+                    20);
         }
+
         int proximoIndice = indice + 1;
+
         if (proximoIndice >= perguntas.size()) {
+
             corridaService.finalizar(corridaId);
-            redirectAttributes.addFlashAttribute("mensagem", "CORRIDA FINALIZADA");
-            return "redirect:/lobby/participante/corridas";
+
+            if (acertou) {
+                redirectAttributes.addFlashAttribute(
+                        "mensagem",
+                        "Resposta correta! Corrida finalizada.");
+            } else {
+                redirectAttributes.addFlashAttribute(
+                        "erro",
+                        "Resposta errada! Corrida finalizada.");
+            }
+
+            return "redirect:/lobby/participante/ranking";
         }
-        return "redirect:/lobby/participante/corridas/" + corridaId + "?indice=" + proximoIndice;
+
+        if (acertou) {
+            redirectAttributes.addFlashAttribute(
+                    "mensagem",
+                    "Resposta correta.");
+        } else {
+            redirectAttributes.addFlashAttribute(
+                    "erro",
+                    "Resposta errada.");
+        }
+
+        return "redirect:/lobby/participante/corridas/" +
+                corridaId +
+                "?indice=" +
+                proximoIndice;
     }
 
     @PostMapping("/lobby/participante/corridas/{corridaId}/desistir")
@@ -199,9 +231,6 @@ public class LobbyController {
         ParticipanteDto participante = obterParticipanteLogado();
         if (participante == null) {
             return "redirect:/auth/login";
-        }
-        if (!participante.getCorridaIds().contains(corridaId)) {
-            return "redirect:/lobby/participante/corridas";
         }
         corridaService.finalizar(corridaId);
         redirectAttributes.addFlashAttribute("mensagem", "CORRIDA FINALIZADA");

@@ -39,14 +39,14 @@
         </div>
 
         <h1 class="welcome-text">
-            Bem vindo <span th:if="${session.usuarioLogado != null}" th:text="${session.usuarioLogado.nome}">Usuário</span><span th:unless="${session.usuarioLogado != null}">!</span><span th:if="${session.usuarioLogado != null}">!</span>
+            Bem vindo <span th:if="${usuarioLogado != null}" th:text="${usuarioLogado.username}">Usuário</span><span th:unless="${usuarioLogado != null}">!</span><span th:if="${usuarioLogado != null}">!</span>
         </h1>
 
-        <p class="welcome-subtitle" th:if="${session.usuarioLogado != null and !session.usuarioLogado.admin}">
+        <p class="welcome-subtitle" th:if="${usuarioLogado != null and !isAdmin}">
             Você está em modo participante. Apenas o lobby está disponível.
         </p>
 
-        <div class="action-buttons" th:if="${session.usuarioLogado != null and session.usuarioLogado.admin}">
+        <div class="action-buttons" th:if="${usuarioLogado != null and isAdmin}">
             <a th:href="@{/corridas}" class="btn-action">
                 <i class="bi bi-trophy"></i> Gerenciar corridas
             </a>
@@ -58,7 +58,7 @@
             </a>
         </div>
 
-        <div class="lobby-note" th:if="${session.usuarioLogado != null and !session.usuarioLogado.admin}">
+        <div class="lobby-note" th:if="${usuarioLogado != null and !isAdmin}">
             <div class="lobby-note-icon"><i class="bi bi-person"></i></div>
             <div>
                 <h2>Acesso de participante</h2>

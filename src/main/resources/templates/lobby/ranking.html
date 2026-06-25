@@ -38,17 +38,25 @@
     </div>
 
     <div class="dashboard-card">
-        <h2>🏆 Ranking de asdasdasdasdasd</h2>
-        <p>Classificação geral por pontuação acumuladaaaaaaaaaaaaaa.</p>
+        <h2>🏆 Ranking de participantes</h2>
+        <p>Classificação geral por pontuação acumulada</p>
     </div>
 
+    <div class="message-stack"
+     th:if="${mensagem != null or erro != null}">
 
-    <div style="background:#fff3cd; padding:10px; margin-bottom:10px; border:1px solid #856404;">
-    DEBUG: paginaAtual=<span th:text="${paginaAtual}"></span> |
-    totalPaginas=<span th:text="${totalPaginas}"></span> |
-    totalElements=<span th:text="${ranking.totalElements}"></span> |
-    tamanhoPagina=<span th:text="${ranking.size}"></span>
+    <div class="message-box message-info"
+         th:if="${mensagem != null}"
+         th:text="${mensagem}">
+    </div>
+
+    <div class="message-box message-error"
+         th:if="${erro != null}"
+         th:text="${erro}">
+    </div>
+
 </div>
+
 
 
 
