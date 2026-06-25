@@ -3,6 +3,7 @@ package com.projetocorridas.projetocorridas.service;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.projetocorridas.projetocorridas.dto.AdministradorLoginDto;
@@ -22,13 +23,18 @@ public class AuthService {
     @Autowired
     private AdministradorRepository administradorRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public Optional<UsuarioAutenticadoDto> autenticarParticipante(ParticipanteLoginDto dto) {
-        return participanteRepository.findByNomeAndSenha(dto.getNome(), dto.getSenha())
+        return participanteRepository.findByNome(dto.getNome())
+                .filter(participante -> passwordEncoder.matches(dto.getSenha(), participante.getSenha()))
                 .map(this::mapearParticipante);
     }
 
     public Optional<UsuarioAutenticadoDto> autenticarAdministrador(AdministradorLoginDto dto) {
-        return administradorRepository.findByEmailAndSenha(dto.getEmail(), dto.getSenha())
+        return administradorRepository.findByEmail(dto.getEmail())
+                .filter(administrador -> passwordEncoder.matches(dto.getSenha(), administrador.getSenha()))
                 .map(this::mapearAdministrador);
     }
 

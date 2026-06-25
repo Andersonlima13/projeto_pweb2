@@ -1,8 +1,13 @@
 package com.projetocorridas.projetocorridas.controller;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,20 +16,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import com.projetocorridas.projetocorridas.dto.AdministradorLoginDto;
 import com.projetocorridas.projetocorridas.dto.ParticipanteLoginDto;
-import com.projetocorridas.projetocorridas.dto.UsuarioAutenticadoDto;
-import com.projetocorridas.projetocorridas.service.AuthService;
 
 @Controller
 @RequestMapping("/auth")
 public class AuthController {
 
     @Autowired
-    private AuthService authService;
+    private AuthenticationManager authenticationManager;
+
+    private final SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
 
     @GetMapping("/login")
     public String loginPage(Model model) {
@@ -35,11 +40,11 @@ public class AuthController {
 
     @PostMapping("/login/participante")
     public String loginParticipante(@ModelAttribute("participanteLoginDto") ParticipanteLoginDto dto,
-            HttpServletRequest request,
+            HttpServletRequest request, HttpServletResponse response,
             RedirectAttributes redirectAttributes) {
-        Optional<UsuarioAutenticadoDto> usuario = authService.autenticarParticipante(dto);
-        if (usuario.isPresent()) {
-            salvarUsuarioNaSessao(request, usuario.get());
+
+        boolean ok = autenticar(dto.getNome(), dto.getSenha(), request, response);
+        if (ok) {
             return "redirect:/lobby/participante";
         }
         redirectAttributes.addFlashAttribute("erro", "Nome ou senha inválidos para participante");
@@ -48,11 +53,11 @@ public class AuthController {
 
     @PostMapping("/corridas")
     public String loginAdministrador(@ModelAttribute("administradorLoginDto") AdministradorLoginDto dto,
-            HttpServletRequest request,
+            HttpServletRequest request, HttpServletResponse response,
             RedirectAttributes redirectAttributes) {
-        Optional<UsuarioAutenticadoDto> usuario = authService.autenticarAdministrador(dto);
-        if (usuario.isPresent()) {
-            salvarUsuarioNaSessao(request, usuario.get());
+
+        boolean ok = autenticar(dto.getEmail(), dto.getSenha(), request, response);
+        if (ok) {
             return "redirect:/lobby";
         }
         redirectAttributes.addFlashAttribute("erro", "Email ou senha inválidos para administrador");
@@ -60,8 +65,8 @@ public class AuthController {
     }
 
     @GetMapping("/logout")
-    public String logout(HttpServletRequest request,
-            RedirectAttributes redirectAttributes) {
+    public String logout(HttpServletRequest request, RedirectAttributes redirectAttributes) {
+        SecurityContextHolder.clearContext();
         if (request.getSession(false) != null) {
             request.getSession(false).invalidate();
         }
@@ -69,8 +74,30 @@ public class AuthController {
         return "redirect:/auth/login";
     }
 
-    private void salvarUsuarioNaSessao(HttpServletRequest request, UsuarioAutenticadoDto usuario) {
-        HttpSession session = request.getSession(true);
-        session.setAttribute("usuarioLogado", usuario);
+    private boolean autenticar(String username, String senha,
+            HttpServletRequest request, HttpServletResponse response) {
+        try {
+            System.out.println("[DEBUG] Tentando autenticar username='" + username + "'");
+            Authentication authRequest = new UsernamePasswordAuthenticationToken(username, senha);
+            Authentication authResult = authenticationManager.authenticate(authRequest);
+
+            System.out.println("[DEBUG] Autenticado com sucesso! principal=" + authResult.getPrincipal()
+                    + " authorities=" + authResult.getAuthorities()
+                    + " isAuthenticated=" + authResult.isAuthenticated());
+
+            SecurityContextHolder.getContext().setAuthentication(authResult);
+            securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
+
+            System.out.println("[DEBUG] Contexto salvo na sessão. sessionId=" + request.getSession(false).getId());
+
+            return true;
+        } catch (BadCredentialsException e) {
+            System.out.println("[DEBUG] BadCredentialsException: " + e.getMessage());
+            return false;
+        } catch (Exception e) {
+            System.out.println("[DEBUG] OUTRA exception capturada: " + e.getClass().getName() + " - " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
 }

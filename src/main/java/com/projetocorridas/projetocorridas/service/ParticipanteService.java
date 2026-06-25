@@ -1,6 +1,7 @@
 package com.projetocorridas.projetocorridas.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.projetocorridas.projetocorridas.dto.ParticipanteDto;
@@ -26,11 +27,14 @@ public class ParticipanteService {
     @Autowired
     private CorridaRepository corridaRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public ParticipanteDto criar(ParticipanteDto participanteDto) {
         validarParticipanteDto(participanteDto);
         Participante participante = new Participante();
         participante.setNome(participanteDto.getNome());
-        participante.setSenha(participanteDto.getSenha());
+        participante.setSenha(passwordEncoder.encode(participanteDto.getSenha()));
         participante.setAdmin(false);
         participante.setPontos(participanteDto.getPontos() == null ? 0 : participanteDto.getPontos());
         participante.setCorridas(obterCorridas(participanteDto.getCorridaIds()));
@@ -68,7 +72,7 @@ public class ParticipanteService {
 
         existente.setNome(participanteDto.getNome());
         if (participanteDto.getSenha() != null && !participanteDto.getSenha().isBlank()) {
-            existente.setSenha(participanteDto.getSenha());
+            existente.setSenha(passwordEncoder.encode(participanteDto.getSenha()));
         }
         existente.setAdmin(false);
         existente.setPontos(participanteDto.getPontos() == null ? existente.getPontos() : participanteDto.getPontos());
