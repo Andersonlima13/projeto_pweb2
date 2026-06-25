@@ -77,26 +77,14 @@ public class AuthController {
     private boolean autenticar(String username, String senha,
             HttpServletRequest request, HttpServletResponse response) {
         try {
-            System.out.println("[DEBUG] Tentando autenticar username='" + username + "'");
             Authentication authRequest = new UsernamePasswordAuthenticationToken(username, senha);
             Authentication authResult = authenticationManager.authenticate(authRequest);
-
-            System.out.println("[DEBUG] Autenticado com sucesso! principal=" + authResult.getPrincipal()
-                    + " authorities=" + authResult.getAuthorities()
-                    + " isAuthenticated=" + authResult.isAuthenticated());
 
             SecurityContextHolder.getContext().setAuthentication(authResult);
             securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
 
-            System.out.println("[DEBUG] Contexto salvo na sessão. sessionId=" + request.getSession(false).getId());
-
             return true;
         } catch (BadCredentialsException e) {
-            System.out.println("[DEBUG] BadCredentialsException: " + e.getMessage());
-            return false;
-        } catch (Exception e) {
-            System.out.println("[DEBUG] OUTRA exception capturada: " + e.getClass().getName() + " - " + e.getMessage());
-            e.printStackTrace();
             return false;
         }
     }
