@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.projetocorridas.projetocorridas.dto.ParticipanteDto;
 import com.projetocorridas.projetocorridas.model.Corrida;
 import com.projetocorridas.projetocorridas.model.Participante;
@@ -55,14 +58,11 @@ public class ParticipanteService {
                 .collect(Collectors.toList());
     }
 
-    public List<ParticipanteDto> listarRanking() {
-        return participanteRepository.findAll().stream()
-                .sorted(Comparator.comparingInt(
-                        (Participante participante) -> participante.getPontos() == null ? 0 : participante.getPontos())
-                        .reversed()
-                        .thenComparing(Participante::getNome, String.CASE_INSENSITIVE_ORDER))
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+    public Page<ParticipanteDto> listarRanking(Pageable pageable) {
+
+        return participanteRepository
+                .findAllByOrderByPontosDesc(pageable)
+                .map(this::mapToDto);
     }
 
     public ParticipanteDto alterar(ParticipanteDto participanteDto) {
@@ -165,4 +165,5 @@ public class ParticipanteService {
             throw new IllegalArgumentException("Senha é obrigatória");
         }
     }
+
 }

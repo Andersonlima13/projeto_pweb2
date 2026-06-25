@@ -596,3 +596,85 @@ body {
         padding-inline: 0.65rem;
     }
 }
+
+
+/* ======================================
+   PAGINAÇÃO DO RANKING
+====================================== */
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 24px;
+    padding-top: 16px;
+}
+
+.btn-page {
+    min-width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    text-decoration: none;
+
+    background: #ffffff;
+    color: #475569;
+
+    border: 1px solid #dbe2ea;
+
+    font-weight: 600;
+
+    transition: all 0.2s ease;
+}
+
+.btn-page:hover {
+    transform: translateY(-2px);
+
+    background: #f8fafc;
+
+    border-color: #3b82f6;
+
+    color: #2563eb;
+}
+
+.active-page {
+    background: linear-gradient(
+        135deg,
+        #2563eb,
+        #3b82f6
+    );
+
+    color: white !important;
+
+    border-color: #2563eb;
+
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+}
+
+.nav-btn {
+    font-size: 1rem;
+}
+
+.nav-btn:hover {
+    background: #eff6ff;
+}
+
+@media (max-width: 768px) {
+
+    .pagination-container {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .btn-page {
+        min-width: 36px;
+        height: 36px;
+        font-size: .9rem;
+    }
+}

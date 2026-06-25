@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -18,7 +23,6 @@ import com.projetocorridas.projetocorridas.dto.CorridaDto;
 import com.projetocorridas.projetocorridas.dto.AlternativaDto;
 import com.projetocorridas.projetocorridas.dto.PerguntaDto;
 import com.projetocorridas.projetocorridas.dto.ParticipanteDto;
-import com.projetocorridas.projetocorridas.model.Participante;
 import com.projetocorridas.projetocorridas.security.AppUserDetails;
 import com.projetocorridas.projetocorridas.service.AlternativaService;
 import com.projetocorridas.projetocorridas.service.PerguntaService;
@@ -61,13 +65,27 @@ public class LobbyController {
     }
 
     @GetMapping("/lobby/participante/ranking")
-    public String ranking(Model model) {
+    public String ranking(
+            @RequestParam(defaultValue = "0") int pagina,
+            Model model) {
+
         AppUserDetails usuario = obterUsuarioLogado();
+
         if (usuario == null) {
             return "redirect:/auth/login";
         }
-        model.addAttribute("ranking", participanteService.listarRanking());
-        model.addAttribute("usuarioLogado", usuario);
+
+        Pageable pageable = PageRequest.of(
+                pagina,
+                5,
+                Sort.by("pontos").descending());
+
+        Page<ParticipanteDto> ranking = participanteService.listarRanking(pageable);
+
+        model.addAttribute("ranking", ranking);
+        model.addAttribute("paginaAtual", pagina);
+        model.addAttribute("totalPaginas", ranking.getTotalPages());
+
         return "lobby/ranking";
     }
 
